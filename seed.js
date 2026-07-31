@@ -42,15 +42,21 @@ const SEED_BEREICHE = [
 ];
 
 const SEED_STUFEN = [
+  // Michel-Entscheidung 2026-07-31: die Bambini bleiben inhaltlich leer, obwohl
+  // Kapitel 5.1 des Leitfadens nach der korrigierten Zuordnung ihr Kapitel waere.
+  // Die juengste Stufe soll eine eigene Handschrift des Vereins bekommen.
+  // BEHALTEN sind die beiden Angaben aus dem DFB-Original (Obergrenze und
+  // Betreuungsschluessel) — das sind keine Inhalte, sondern Regeln, und die
+  // Obergrenze speist die Warnung beim Verknuepfen von Uebungen.
   {
     id: "g", kuerzel: "G", name: "Bambini / G-Junioren", vonU: 6, bisU: 7,
     bereichId: "grundlage", reihenfolge: 1, altersspanne: "6-7 Jahre",
-    entwicklungsstand: "Starke Ich-Perspektive, fokussiert auf Ball und Tor, spielerische Grundlagen werden erlernt, hohe Freude an Bewegung und Fangspielen.",
+    entwicklungsstand: "",
     obergrenzeText: "2 gegen 2", obergrenzeSpieler: 2, anspielerErlaubt: false,
-    nettospielzeit: "mind. 48 Min./Woche", betreuung: "1 Spielfeldbegleiter pro 4 Kinder",
+    nettospielzeit: "", betreuung: "1 Spielfeldbegleiter pro 4 Kinder",
     frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: true },
-    spieltagHinweise: "Mehrere kleine Felder mit jeweils 3v3 oder 4v4 · Alle Kinder spielen gleich lange · Fokus auf Spaß und Freude, weniger auf Ergebnisse",
-    hinweis: "Engste Spielform-Grenze der ganzen Ausbildung: der gemeinsame Übungskatalog hält dafür nur wenige passende Formen bereit. Eigene Spiel- und Fangformen ergänzt die Nachwuchsleitung."
+    spieltagHinweise: "",
+    hinweis: "Für diese Stufe sind noch keine Trainingsschwerpunkte hinterlegt — die Nachwuchsleitung trägt sie selbst ein. Die DFB-Obergrenze von 2 gegen 2 und der Betreuungsschlüssel stehen bereits, weil sie aus der Trainingsphilosophie vorgegeben sind."
   },
   {
     id: "f", kuerzel: "F", name: "F-Junioren", vonU: 8, bisU: 9,
@@ -425,27 +431,13 @@ const SEED_UEBUNGEN = [
 // einhalten — deshalb haben die Bambini (max. 2 gegen 2) sichtbar weniger als die
 // späteren Stufen.
 const SEED_SCHWERPUNKTE = [
-  // ---------- Bambini / G-Junioren (U6/U7), Kapitel 5.1 ----------
-  { id: "g-01", stufeId: "g", reihenfolge: 1, aktiv: true, trainingsart: "beide",
-    titel: "Ballbeherrschung und Dribbeln",
-    beschreibung: "Mit dem Ball am Fuß spielen.", uebungIds: ["gz-04"] },
-  { id: "g-02", stufeId: "g", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
-    titel: "Spielerische Formen",
-    beschreibung: "Fangspiele mit Ball.", uebungIds: [] },
-  { id: "g-03", stufeId: "g", reihenfolge: 3, aktiv: true, trainingsart: "beide",
-    titel: "Erste 1v1-Duelle",
-    beschreibung: "Auf spielerische Art.", uebungIds: ["gz-04", "an-03"] },
-  { id: "g-04", stufeId: "g", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
-    titel: "Mehrere Minitore statt Großfeld",
-    beschreibung: "", uebungIds: ["an-03"] },
-  { id: "g-05", stufeId: "g", reihenfolge: 5, aktiv: true, trainingsart: "beide",
-    titel: "Verschiedene Ballarten",
-    beschreibung: "Unterschiedliche Größen und Gewichte.", uebungIds: [] },
+  // Bambini / G-Junioren (U6/U7) bleiben bewusst ohne Schwerpunkte — siehe die
+  // Notiz an der Stufe oben.
 
   // ---------- F-Junioren (U8/U9), Kapitel 5.2 ----------
   { id: "f-01", stufeId: "f", reihenfolge: 1, aktiv: true, trainingsart: "beide",
     titel: "Persönliche Duelle",
-    beschreibung: "1v1 mit höherem Fokus.", uebungIds: ["gz-04", "gz-06"] },
+    beschreibung: "1v1 mit höherem Fokus.", uebungIds: ["gz-04", "an-03", "gz-06"] },
   { id: "f-02", stufeId: "f", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
     titel: "3v3 und 4v4 Spiele",
     beschreibung: "Verknüpft sind die Formen bis 3 gegen 3 — größere liegen über der DFB-Obergrenze dieser Stufe.",
