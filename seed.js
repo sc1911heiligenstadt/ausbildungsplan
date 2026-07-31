@@ -1,24 +1,40 @@
 // Startbestand des Ausbildungsplans.
 //
-// Quelle: DFB "Trainingsphilosophie Deutschland", aufbereitet im vereinseigenen
-// Trainingsleitfaden G- bis A-Jugend (2026).
+// Quelle: DFB "Trainingsphilosophie Deutschland" (original_TPD.pdf), aufbereitet
+// im vereinseigenen Trainingsleitfaden G- bis A-Jugend (2026).
 //
-// WICHTIG — korrigierte Altersklassen-Zuordnung: Der Word-Leitfaden ordnet die
-// Junioren-Buchstaben um eine Stufe verschoben zu (er nennt die 12/13-Jährigen
-// "E-Jugend", offiziell sind das D-Junioren). Die Altersangaben in Jahren stimmen,
-// nur die Etiketten waren falsch. Dieser Seed ordnet deshalb nach LEBENSALTER zu
-// und benennt die Stufen nach der offiziellen DFB-Nomenklatur:
+// ⚠️ KORRIGIERTE ALTERSKLASSEN-ZUORDNUNG — die Jahresangaben, nicht die Buchstaben
 //
-//   Leitfaden-Kapitel   Alter    Stufe hier
-//   5.1 "G-Jugend"      8-9  ->  F-Junioren (U8/U9)
-//   5.2 "F-Jugend"     10-11 ->  E-Junioren (U10/U11)
-//   5.3 "E-Jugend"     12-13 ->  D-Junioren (U12/U13)
-//   5.4 "D-Jugend"     14-15 ->  C-Junioren (U14/U15)
-//   5.5 "C-Jugend"     16-17 ->  B-Junioren (U16/U17)
-//   5.6 + 5.7          18-19 ->  A-Junioren (U18/U19)
+// Der Word-Leitfaden hängt an jede Juniorenstufe eine falsche U-Zahl und
+// Jahresangabe: er nennt die E-Junioren "U12/U13, 12-13 Jahre" (richtig wäre
+// U10/U11) und die Bambini "U9, 8-9 Jahre" (richtig wäre U6/U7). Die
+// BUCHSTABEN sind dagegen korrekt — nachgewiesen am Original, das die
+// Spielform-Obergrenzen ausdrücklich nach Buchstaben nennt:
 //
-// Wörtliche Zitate bleiben unverändert — auch dort, wo sie eine Altersklasse
-// nennen. Korrigiert wurden nur Überschriften und beschreibende Texte.
+//   "Bambini: Spielformen dürfen 2-gegen-2-Varianten nicht übersteigen. […] ein
+//    Begleiter pro vier Kinder. F-Junioren: […] maximal auf 3 plus TW gegen 3 plus
+//    TW […] für jeweils sechs Spieler […] einen Spielfeldbegleiter. E-Junioren:
+//    […] darf die Größe der Spielformen ein 4 plus TW gegen 4 plus TW nicht
+//    übersteigen. D- bis A-Junioren: […] vom 1 gegen 1 bis zum 4 gegen 4 […] um
+//    bis zu zwei Anspieler pro Team erweitert werden."
+//
+// Deshalb wird hier nach BUCHSTABEN zugeordnet und die Altersspanne korrigiert:
+//
+//   Leitfaden-Kapitel   Stufe hier              korrekte Spanne
+//   5.1 "G-Jugend"  ->  Bambini / G-Junioren    U6/U7  (6-7 Jahre)
+//   5.2 "F-Jugend"  ->  F-Junioren              U8/U9  (8-9 Jahre)
+//   5.3 "E-Jugend"  ->  E-Junioren              U10/U11 (10-11 Jahre)
+//   5.4 "D-Jugend"  ->  D-Junioren              U12/U13 (12-13 Jahre)
+//   5.5 "C-Jugend"  ->  C-Junioren              U14/U15 (14-15 Jahre)
+//   5.6 "B-Jugend"  ->  B-Junioren              U16/U17 (16-17 Jahre)
+//   5.7 "A-Jugend"  ->  A-Junioren              U18/U19 (18-19 Jahre)
+//
+// Obergrenzen und Betreuungsschlüssel stammen aus dem Original, alles Übrige
+// (Entwicklungsstand, Trainings-Fokus, Spieltag-Hinweise) aus dem Leitfaden.
+// Die wöchentliche Nettospielzeit steht so NICHT im DFB-Dokument — sie ist eine
+// Ergänzung des Leitfadens; der Bruch 48 -> 32 Minuten liegt dort bei U17.
+//
+// Wörtliche Zitate bleiben unverändert, auch wo sie eine Altersklasse nennen.
 
 const SEED_BEREICHE = [
   { id: "grundlage", name: "Grundlagenbereich", vonU: 6, bisU: 13, reihenfolge: 1 },
@@ -27,28 +43,18 @@ const SEED_BEREICHE = [
 
 const SEED_STUFEN = [
   {
-    id: "bambini", kuerzel: "G", name: "Bambini / G-Junioren", vonU: 6, bisU: 7,
+    id: "g", kuerzel: "G", name: "Bambini / G-Junioren", vonU: 6, bisU: 7,
     bereichId: "grundlage", reihenfolge: 1, altersspanne: "6-7 Jahre",
-    entwicklungsstand: "",
-    obergrenzeText: "", obergrenzeSpieler: null, anspielerErlaubt: false,
-    nettospielzeit: "", betreuung: "",
-    frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: true },
-    spieltagHinweise: "",
-    hinweis: "Für diese Stufe liegen noch keine Inhalte vor. Die DFB-Trainingsphilosophie setzt erst ab dem F-Junioren-Alter an — Schwerpunkte und Übungen für die Bambini trägt die Nachwuchsleitung selbst ein."
-  },
-  {
-    id: "f", kuerzel: "F", name: "F-Junioren", vonU: 8, bisU: 9,
-    bereichId: "grundlage", reihenfolge: 2, altersspanne: "8-9 Jahre",
     entwicklungsstand: "Starke Ich-Perspektive, fokussiert auf Ball und Tor, spielerische Grundlagen werden erlernt, hohe Freude an Bewegung und Fangspielen.",
     obergrenzeText: "2 gegen 2", obergrenzeSpieler: 2, anspielerErlaubt: false,
     nettospielzeit: "mind. 48 Min./Woche", betreuung: "1 Spielfeldbegleiter pro 4 Kinder",
     frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: true },
     spieltagHinweise: "Mehrere kleine Felder mit jeweils 3v3 oder 4v4 · Alle Kinder spielen gleich lange · Fokus auf Spaß und Freude, weniger auf Ergebnisse",
-    hinweis: "Die DFB-Obergrenze von 2 gegen 2 ist in dieser Stufe die engste der ganzen Ausbildung — der gemeinsame Übungskatalog hält dafür nur wenige passende Formen bereit. Eigene Übungen ergänzt die Nachwuchsleitung."
+    hinweis: "Engste Spielform-Grenze der ganzen Ausbildung: der gemeinsame Übungskatalog hält dafür nur wenige passende Formen bereit. Eigene Spiel- und Fangformen ergänzt die Nachwuchsleitung."
   },
   {
-    id: "e", kuerzel: "E", name: "E-Junioren", vonU: 10, bisU: 11,
-    bereichId: "grundlage", reihenfolge: 3, altersspanne: "10-11 Jahre",
+    id: "f", kuerzel: "F", name: "F-Junioren", vonU: 8, bisU: 9,
+    bereichId: "grundlage", reihenfolge: 2, altersspanne: "8-9 Jahre",
     entwicklungsstand: "Erste Mannschaftsfähigkeiten entstehen, verteidigt noch impulsiv, aber koordinative Entwicklung nimmt zu.",
     obergrenzeText: "3(+TW) gegen 3(+TW)", obergrenzeSpieler: 3, anspielerErlaubt: false,
     nettospielzeit: "mind. 48 Min./Woche", betreuung: "1 Spielfeldbegleiter pro 6 Feldspieler (ggf. plus 2 Torhüter)",
@@ -57,43 +63,53 @@ const SEED_STUFEN = [
     hinweis: ""
   },
   {
-    id: "d", kuerzel: "D", name: "D-Junioren", vonU: 12, bisU: 13,
-    bereichId: "grundlage", reihenfolge: 4, altersspanne: "12-13 Jahre",
+    id: "e", kuerzel: "E", name: "E-Junioren", vonU: 10, bisU: 11,
+    bereichId: "grundlage", reihenfolge: 3, altersspanne: "10-11 Jahre",
     entwicklungsstand: "Kooperatives Spiel nimmt zu, erste Strategien entstehen, körperliche Unterschiede wachsen, technische Fähigkeiten werden robuster.",
     obergrenzeText: "4(+TW) gegen 4(+TW)", obergrenzeSpieler: 4, anspielerErlaubt: false,
     nettospielzeit: "mind. 48 Min./Woche", betreuung: "",
-    frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: false },
+    frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: true },
     spieltagHinweise: "7v7 oder mehrere 5v5-Felder · Alle Spieler spielen mindestens 75% der Gesamtspielzeit · Zwillings-Turniere mit mehreren Feldern (jedes Kind spielt immer)",
-    hinweis: "Zwischenstufe zum leistungsorientierten Bereich: die U12/U13 bereitet auf den Übergang ab der U14 vor."
+    hinweis: "Fokusjahrgang U11: Übergangsphase laut Konzeptpapier."
+  },
+  {
+    id: "d", kuerzel: "D", name: "D-Junioren", vonU: 12, bisU: 13,
+    bereichId: "grundlage", reihenfolge: 4, altersspanne: "12-13 Jahre",
+    entwicklungsstand: "Pubertätsphase, Leistungsunterschiede wachsen, taktisches Verständnis reift, noch zunehmende körperliche Entwicklung.",
+    obergrenzeText: "1 gegen 1 bis 4 gegen 4, ab hier +2 Anspieler pro Team erlaubt", obergrenzeSpieler: 6, anspielerErlaubt: true,
+    nettospielzeit: "mind. 48 Min./Woche", betreuung: "",
+    frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: false },
+    spieltagHinweise: "7v7 Zwillings-Turniere (zwei 7v7-Felder gleichzeitig) · Alle 14 Spieler spielen; 2 Torwarte in voller Spielzeit · Niveaugerechte Einteilung (Gold/Silber/Bronze)",
+    hinweis: "Zwischenstufe zum leistungsorientierten Bereich: die U12/U13 bereitet auf den Übergang ab der U14 vor. Ab dieser Stufe gehört gezieltes, taktisch akzentuiertes Spielen dazu — siehe die Säule „Eine Linie verteidigen/bespielen“."
   },
   {
     id: "c", kuerzel: "C", name: "C-Junioren", vonU: 14, bisU: 15,
     bereichId: "leistung", reihenfolge: 5, altersspanne: "14-15 Jahre",
-    entwicklungsstand: "Pubertätsphase, Leistungsunterschiede wachsen, taktisches Verständnis reift, noch zunehmende körperliche Entwicklung.",
-    obergrenzeText: "1v1 bis 4v4, ab hier +2 Anspieler pro Team erlaubt", obergrenzeSpieler: 6, anspielerErlaubt: true,
+    entwicklungsstand: "Physische Reife wird erreicht, taktisches Verständnis ist erwachsen, individuelle Spezialisierung auf Positionen erlaubt (in gesunder Mischung mit ganzheitlicher Ausbildung).",
+    obergrenzeText: "1 gegen 1 bis 4 gegen 4 (+2 Anspieler)", obergrenzeSpieler: 6, anspielerErlaubt: true,
     nettospielzeit: "mind. 48 Min./Woche", betreuung: "",
     frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: false },
-    spieltagHinweise: "7v7 Zwillings-Turniere (zwei 7v7-Felder gleichzeitig) · Alle 14 Spieler spielen; 2 Torwarte in voller Spielzeit · Niveaugerechte Einteilung (Gold/Silber/Bronze)",
-    hinweis: "Ab dieser Stufe gehört gezieltes, taktisch akzentuiertes Spielen dazu — siehe die Säule „Eine Linie verteidigen/bespielen“."
+    spieltagHinweise: "9v9 oder 11v11 Spiele · Wettkampf in Ligensystem mit Niveaus · Mindestens 75% Spielzeit für alle Kader-Spieler",
+    hinweis: "Einstieg in den leistungsorientierten Bereich. Ab dieser Stufe erlaubt die Trainingsphilosophie ausdrücklich Positionsspezifik — in gesunder Mischung mit ganzheitlicher Ausbildung."
   },
   {
     id: "b", kuerzel: "B", name: "B-Junioren", vonU: 16, bisU: 17,
     bereichId: "leistung", reihenfolge: 6, altersspanne: "16-17 Jahre",
-    entwicklungsstand: "Physische Reife wird erreicht, taktisches Verständnis ist erwachsen, individuelle Spezialisierung auf Positionen erlaubt (in gesunder Mischung mit ganzheitlicher Ausbildung).",
-    obergrenzeText: "1v1 bis 4v4 (+2 Anspieler)", obergrenzeSpieler: 6, anspielerErlaubt: true,
+    entwicklungsstand: "Nahezu vollständige Reife, sehr hohes Leistungsspektrum, professionelle Ansätze werden eingeführt, Vorbereitung auf den Seniorenfußball.",
+    obergrenzeText: "1 gegen 1 bis 4 gegen 4 (+2 Anspieler)", obergrenzeSpieler: 6, anspielerErlaubt: true,
     nettospielzeit: "48 Min./Woche (U16), ab U17: 32 Min./Woche", betreuung: "",
     frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: false },
-    spieltagHinweise: "9v9 oder 11v11 Spiele · Wettkampf in Ligensystem mit Niveaus · Mindestens 75% Spielzeit für alle Kader-Spieler",
-    hinweis: ""
+    spieltagHinweise: "11v11 Ligaspiele mit regelmäßigen Einsatzzeiten · Pokal- und Ligasystem",
+    hinweis: "Fokusjahrgang U17: letzte Stufe des Organigramms im Konzeptpapier."
   },
   {
     id: "a", kuerzel: "A", name: "A-Junioren", vonU: 18, bisU: 19,
     bereichId: "leistung", reihenfolge: 7, altersspanne: "18-19 Jahre",
-    entwicklungsstand: "Nahezu vollständige Reife, sehr hohes Leistungsspektrum, professionelle Ansätze werden eingeführt, Vorbereitung auf den Seniorenfußball.",
-    obergrenzeText: "1v1 bis 4v4 (+2 Anspieler)", obergrenzeSpieler: 6, anspielerErlaubt: true,
+    entwicklungsstand: "Vollerreichte Reife, professionelle Ansprüche, Vorbereitung auf Seniorenfußball oder höherklassigen Fußball, Individualität und Leistung im Fokus.",
+    obergrenzeText: "1 gegen 1 bis 4 gegen 4 (+2 Anspieler)", obergrenzeSpieler: 6, anspielerErlaubt: true,
     nettospielzeit: "mind. 32 Min./Woche", betreuung: "",
     frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: false },
-    spieltagHinweise: "11v11 Ligaspiele mit regelmäßigen Einsatzzeiten · Pokal- und Ligasystem · Wechsel zwischen Entwicklung und voller Leistung · Vorbereitung auf Seniorenfußball bzw. akademische/berufliche Karriere",
+    spieltagHinweise: "11v11 Ligaspiele · Wechsel zwischen Entwicklung und voller Leistung · Vorbereitung auf Seniorenfußball bzw. akademische/berufliche Karriere",
     hinweis: "Das Organigramm des Konzeptpapiers endet bei U17 — die A-Junioren laufen dort unter „Übergang in den Männerbereich“."
   },
   {
@@ -104,7 +120,7 @@ const SEED_STUFEN = [
     nettospielzeit: "", betreuung: "",
     frequenz: { mannschaft: 2, foerder: 1, foerderFreiwillig: false },
     spieltagHinweise: "",
-    hinweis: "Für diese Stufe liegen noch keine Inhalte vor. Die DFB-Trainingsphilosophie endet mit dem Juniorenbereich — Schwerpunkte und Übungen für die U23 trägt die Nachwuchsleitung selbst ein."
+    hinweis: "Für diese Stufe liegen noch keine Inhalte vor. Die Trainingsphilosophie Deutschland endet mit dem Juniorenbereich — Schwerpunkte und Übungen für die U23 trägt die Nachwuchsleitung selbst ein."
   }
 ];
 
@@ -119,7 +135,7 @@ const SEED_SAEULEN = [
   },
   {
     id: "linie", name: "Eine Linie verteidigen/bespielen", reihenfolge: 3,
-    beschreibung: "Ab dem Alter der C-Junioren (14/15 Jahre) sollte gezieltes, taktisch akzentuiertes Fußballspielen eingeplant werden. Diese Spielformen schulen das Verteidigen im Verbund (Verschieben, Herausrücken, Absichern) sowie das Bespielen einer organisierten Abwehr unter Abseitsregel."
+    beschreibung: "Ab dem Alter der D-Junioren sollte gezieltes, taktisch akzentuiertes Fußballspielen eingeplant werden. Diese Spielformen schulen das Verteidigen im Verbund (Verschieben, Herausrücken, Absichern) sowie das Bespielen einer organisierten Abwehr unter Abseitsregel."
   },
   {
     id: "ueberunterzahl", name: "Über-/Unterzahlspiele", reihenfolge: 4,
@@ -403,104 +419,107 @@ const SEED_UEBUNGEN = [
   }
 ];
 
-// Die Schwerpunkte sind wörtlich die „Trainings-Fokus“-Punkte der Alterskapitel.
+// Die Schwerpunkte sind wörtlich die „Trainings-Fokus“-Punkte der Alterskapitel,
+// zugeordnet nach Buchstabe (Kapitel 5.1 = Bambini/G … 5.7 = A-Junioren).
 // Verknüpft sind nur Übungen, die die DFB-Obergrenze der jeweiligen Stufe
-// einhalten — deshalb hat die F-Stufe (max. 2 gegen 2) sichtbar weniger als die
-// späteren.
+// einhalten — deshalb haben die Bambini (max. 2 gegen 2) sichtbar weniger als die
+// späteren Stufen.
 const SEED_SCHWERPUNKTE = [
-  // ---------- F-Junioren (U8/U9) ----------
-  { id: "f-01", stufeId: "f", reihenfolge: 1, aktiv: true, trainingsart: "beide",
+  // ---------- Bambini / G-Junioren (U6/U7), Kapitel 5.1 ----------
+  { id: "g-01", stufeId: "g", reihenfolge: 1, aktiv: true, trainingsart: "beide",
     titel: "Ballbeherrschung und Dribbeln",
     beschreibung: "Mit dem Ball am Fuß spielen.", uebungIds: ["gz-04"] },
-  { id: "f-02", stufeId: "f", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
+  { id: "g-02", stufeId: "g", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
     titel: "Spielerische Formen",
     beschreibung: "Fangspiele mit Ball.", uebungIds: [] },
-  { id: "f-03", stufeId: "f", reihenfolge: 3, aktiv: true, trainingsart: "beide",
+  { id: "g-03", stufeId: "g", reihenfolge: 3, aktiv: true, trainingsart: "beide",
     titel: "Erste 1v1-Duelle",
     beschreibung: "Auf spielerische Art.", uebungIds: ["gz-04", "an-03"] },
-  { id: "f-04", stufeId: "f", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
+  { id: "g-04", stufeId: "g", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
     titel: "Mehrere Minitore statt Großfeld",
     beschreibung: "", uebungIds: ["an-03"] },
-  { id: "f-05", stufeId: "f", reihenfolge: 5, aktiv: true, trainingsart: "beide",
+  { id: "g-05", stufeId: "g", reihenfolge: 5, aktiv: true, trainingsart: "beide",
     titel: "Verschiedene Ballarten",
     beschreibung: "Unterschiedliche Größen und Gewichte.", uebungIds: [] },
 
-  // ---------- E-Junioren (U10/U11) ----------
-  { id: "e-01", stufeId: "e", reihenfolge: 1, aktiv: true, trainingsart: "beide",
+  // ---------- F-Junioren (U8/U9), Kapitel 5.2 ----------
+  { id: "f-01", stufeId: "f", reihenfolge: 1, aktiv: true, trainingsart: "beide",
     titel: "Persönliche Duelle",
     beschreibung: "1v1 mit höherem Fokus.", uebungIds: ["gz-04", "gz-06"] },
-  { id: "e-02", stufeId: "e", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
+  { id: "f-02", stufeId: "f", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
     titel: "3v3 und 4v4 Spiele",
     beschreibung: "Verknüpft sind die Formen bis 3 gegen 3 — größere liegen über der DFB-Obergrenze dieser Stufe.",
     uebungIds: ["gz-05", "gz-06", "an-09", "uu-04"] },
-  { id: "e-03", stufeId: "e", reihenfolge: 3, aktiv: true, trainingsart: "beide",
+  { id: "f-03", stufeId: "f", reihenfolge: 3, aktiv: true, trainingsart: "beide",
     titel: "Grundtechniken: Ballannahme, Passspiel, Torschuss",
     beschreibung: "", uebungIds: ["an-01", "an-11"] },
-  { id: "e-04", stufeId: "e", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
+  { id: "f-04", stufeId: "f", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
     titel: "Erste taktische Elemente",
     beschreibung: "Positionsverständnis.", uebungIds: ["gz-06", "an-02", "an-10"] },
 
-  // ---------- D-Junioren (U12/U13) ----------
-  { id: "d-01", stufeId: "d", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
+  // ---------- E-Junioren (U10/U11), Kapitel 5.3 ----------
+  { id: "e-01", stufeId: "e", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
     titel: "3v3 bis 4v4 mit taktischen Elementen",
     beschreibung: "", uebungIds: ["gz-01", "gz-03", "gz-06", "gz-07"] },
-  { id: "d-02", stufeId: "d", reihenfolge: 2, aktiv: true, trainingsart: "beide",
+  { id: "e-02", stufeId: "e", reihenfolge: 2, aktiv: true, trainingsart: "beide",
     titel: "Passspiel und Ballkontrolle in Spielsituationen",
     beschreibung: "", uebungIds: ["an-04", "an-05", "uu-01", "uu-02"] },
-  { id: "d-03", stufeId: "d", reihenfolge: 3, aktiv: true, trainingsart: "mannschaft",
+  { id: "e-03", stufeId: "e", reihenfolge: 3, aktiv: true, trainingsart: "mannschaft",
     titel: "Erste Rückpassregel",
     beschreibung: "", uebungIds: ["gz-01"] },
-  { id: "d-04", stufeId: "d", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
+  { id: "e-04", stufeId: "e", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
     titel: "Spezialisierung von Positionen",
     beschreibung: "Abwehr, Mittelfeld, Angriff.", uebungIds: ["an-06", "an-08", "li-01"] },
-  { id: "d-05", stufeId: "d", reihenfolge: 5, aktiv: true, trainingsart: "beide",
+  { id: "e-05", stufeId: "e", reihenfolge: 5, aktiv: true, trainingsart: "beide",
     titel: "Kopfballtraining beginnt",
     beschreibung: "", uebungIds: ["an-07", "an-08"] },
 
-  // ---------- C-Junioren (U14/U15) ----------
-  { id: "c-01", stufeId: "c", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
+  // ---------- D-Junioren (U12/U13), Kapitel 5.4 ----------
+  { id: "d-01", stufeId: "d", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
     titel: "4v4 bis 6v6 auf kleineren Feldern",
     beschreibung: "", uebungIds: ["gz-01", "gz-02", "gz-07", "an-05"] },
-  { id: "c-02", stufeId: "c", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
+  { id: "d-02", stufeId: "d", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
     titel: "Organisierte Abwehr",
     beschreibung: "Viererkette, Abseitslinie.", uebungIds: ["li-01", "li-02", "li-03", "li-04", "li-05", "li-06"] },
-  { id: "c-03", stufeId: "c", reihenfolge: 3, aktiv: true, trainingsart: "foerder",
+  { id: "d-03", stufeId: "d", reihenfolge: 3, aktiv: true, trainingsart: "foerder",
     titel: "Anforderungsspezifische Trainings",
     beschreibung: "Positions-Fokus.", uebungIds: ["an-07", "an-08", "uu-03"] },
-  { id: "c-04", stufeId: "c", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
+  { id: "d-04", stufeId: "d", reihenfolge: 4, aktiv: true, trainingsart: "mannschaft",
     titel: "Hohe Intensität mit schnellen Umschaltungen",
     beschreibung: "", uebungIds: ["gz-04", "uu-01", "uu-04"] },
 
-  // ---------- B-Junioren (U16/U17) ----------
-  { id: "b-01", stufeId: "b", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
+  // ---------- C-Junioren (U14/U15), Kapitel 5.5 ----------
+  { id: "c-01", stufeId: "c", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
     titel: "6v6 bis 8v8 auf kleineren/mittleren Feldern",
     beschreibung: "", uebungIds: ["an-05", "an-07", "li-04"] },
-  { id: "b-02", stufeId: "b", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
+  { id: "c-02", stufeId: "c", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
     titel: "Organisierte Defensivtaktiken",
     beschreibung: "Linien, Zonen.", uebungIds: ["li-01", "li-02", "li-04", "li-06"] },
-  { id: "b-03", stufeId: "b", reihenfolge: 3, aktiv: true, trainingsart: "beide",
+  { id: "c-03", stufeId: "c", reihenfolge: 3, aktiv: true, trainingsart: "beide",
     titel: "Schnelle Umschaltspiele, positionsspezifisches Training",
     beschreibung: "", uebungIds: ["gz-06", "uu-01", "uu-02", "uu-03"] },
 
-  // ---------- A-Junioren (U18/U19) ----------
-  { id: "a-01", stufeId: "a", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
+  // ---------- B-Junioren (U16/U17), Kapitel 5.6 ----------
+  { id: "b-01", stufeId: "b", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
     titel: "9v9 bis 11v11 auf regulären Feldern",
     beschreibung: "", uebungIds: ["an-02", "li-04"] },
-  { id: "a-02", stufeId: "a", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
+  { id: "b-02", stufeId: "b", reihenfolge: 2, aktiv: true, trainingsart: "mannschaft",
     titel: "Taktische Spiel-Systeme",
     beschreibung: "4-3-3, 4-4-2, 3-5-2.", uebungIds: ["li-02", "li-04"] },
-  { id: "a-03", stufeId: "a", reihenfolge: 3, aktiv: true, trainingsart: "beide",
+  { id: "b-03", stufeId: "b", reihenfolge: 3, aktiv: true, trainingsart: "beide",
     titel: "Athletische Spitzenleistung, mentales Training",
     beschreibung: "", uebungIds: ["gz-04", "uu-04"] },
-  { id: "a-04", stufeId: "a", reihenfolge: 4, aktiv: true, trainingsart: "foerder",
+
+  // ---------- A-Junioren (U18/U19), Kapitel 5.7 ----------
+  { id: "a-01", stufeId: "a", reihenfolge: 1, aktiv: true, trainingsart: "mannschaft",
+    titel: "11v11 auf regulären Plätzen, hochfrequente intensive Trainings",
+    beschreibung: "", uebungIds: ["an-02", "gz-03"] },
+  { id: "a-02", stufeId: "a", reihenfolge: 2, aktiv: true, trainingsart: "foerder",
     titel: "Individuelle Technik und Athletik auf höchstem Niveau",
     beschreibung: "", uebungIds: ["gz-02", "uu-03"] },
-  { id: "a-05", stufeId: "a", reihenfolge: 5, aktiv: true, trainingsart: "mannschaft",
+  { id: "a-03", stufeId: "a", reihenfolge: 3, aktiv: true, trainingsart: "mannschaft",
     titel: "Mannschaftstaktik, mentale Stärke, Professionalismus",
-    beschreibung: "", uebungIds: ["li-01", "li-04", "uu-01"] },
-  { id: "a-06", stufeId: "a", reihenfolge: 6, aktiv: true, trainingsart: "mannschaft",
-    titel: "Hochfrequente intensive Trainings",
-    beschreibung: "", uebungIds: ["gz-03", "an-02"] }
+    beschreibung: "", uebungIds: ["li-01", "li-04", "uu-01"] }
 ];
 
 // Aufbau einer idealen Trainingseinheit (Kapitel 4 des Leitfadens) — reine
