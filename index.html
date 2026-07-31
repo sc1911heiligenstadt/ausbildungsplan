@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🎯 Ausbildungsplan</title>
+<meta name="theme-color" content="#1a56a0" />
+<link rel="stylesheet" href="style.css?v=1.0" />
+</head>
+<body>
+
+<header>
+  <h1>🎯 Ausbildungsplan <span class="version-badge version-badge-link" id="version-badge" role="button" tabindex="0" title="Versionshistorie ansehen"></span></h1>
+  <a href="https://tecko1985.github.io/ToolsUebersicht/" class="back-to-dashboard">← Zurück zum Dashboard</a>
+  <div class="header-right">
+    <span class="header-user" id="header-user"></span>
+    <img class="header-logo" src="logo.png" alt="1. SC 1911 e.V. Heilbad Heiligenstadt" />
+  </div>
+</header>
+
+<!-- Verbindungs-Screen -->
+<div class="connect-screen" id="connect-screen">
+  <div class="card" id="cloud-login-section">
+    <h2>Anmeldung erforderlich</h2>
+    <p class="muted">
+      Der Ausbildungsplan liegt in der Vereins-Nextcloud. Melde dich einmalig in der
+      <strong>Tools-Übersicht</strong> an – danach wird diese Seite automatisch
+      geladen, ganz ohne Zugangsdaten oder App-Passwort auf diesem Gerät.
+      Funktioniert auch mobil.
+    </p>
+    <div class="btn-row" style="justify-content:flex-start;">
+      <a class="btn" href="https://tecko1985.github.io/ToolsUebersicht/">Zur Tools-Übersicht &amp; anmelden</a>
+    </div>
+    <p class="muted" id="cloud-error" style="display:none; color:#c0392b; margin-top:12px;"></p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app-shell" style="display:none;">
+  <nav>
+    <button data-tab="ausbildung" class="active">Ausbildung</button>
+    <button data-tab="uebungen">Übungen</button>
+    <button data-tab="spieltage">Spieltage</button>
+    <button data-tab="auswertung">Auswertung</button>
+    <div class="nav-right">
+      <button data-tab="verwaltung" id="nav-verwaltung" style="display:none;">Verwaltung</button>
+      <button data-tab="info">Info</button>
+    </div>
+  </nav>
+  <div class="save-status" id="save-status"></div>
+  <main>
+
+    <!-- ---------- Ausbildung ---------- -->
+    <section class="tab-section active" id="tab-ausbildung">
+
+      <div class="card" id="leerstand-card" style="display:none;">
+        <h2>Noch keine Inhalte hinterlegt</h2>
+        <p class="muted">
+          Der Ausbildungsplan ist leer. Der Startbestand aus der Trainingsphilosophie
+          Deutschland (8 Juniorenstufen, 27 Schwerpunkte, 28 Übungen) lässt sich mit
+          einem Klick einspielen — das darf die Nachwuchsleitung im Tab „Verwaltung“.
+        </p>
+        <div class="btn-row admin-only" style="justify-content:flex-start;">
+          <button type="button" class="btn success" id="btn-seed-direkt">Startbestand einspielen</button>
+        </div>
+      </div>
+
+      <div class="card" id="stufenwahl-card">
+        <div class="card-header-row">
+          <h2>Altersklasse wählen</h2>
+          <button type="button" class="btn secondary small editor-only" id="btn-print-stufe">Druckansicht</button>
+        </div>
+        <p class="muted">Die Schwerpunkte werden je Juniorenstufe gepflegt. Wähle deine U-Mannschaft — die passende Stufe wird automatisch gefunden.</p>
+        <div class="stufen-chips" id="stufen-chips"></div>
+      </div>
+
+      <div id="stufen-detail"></div>
+
+    </section>
+
+    <!-- ---------- Übungen ---------- -->
+    <section class="tab-section" id="tab-uebungen">
+      <div class="card">
+        <h2>Übungskatalog</h2>
+        <p class="muted">Alle Spielformen des Vereins. Eine Übung kann an mehreren Schwerpunkten und Stufen hängen.</p>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Säule</label>
+            <select id="filter-saeule"><option value="">Alle Säulen</option></select>
+          </div>
+          <div class="form-field">
+            <label>Trainingsart</label>
+            <select id="filter-trainingsart"><option value="">Alle</option></select>
+          </div>
+          <div class="form-field">
+            <label>Passend zu Stufe</label>
+            <select id="filter-stufe"><option value="">Alle Stufen</option></select>
+          </div>
+          <div class="form-field">
+            <label>Suche</label>
+            <input type="text" id="filter-suche" placeholder="Name, Aufbau, Ablauf …" />
+          </div>
+        </div>
+        <p class="muted" id="uebungen-count"></p>
+      </div>
+      <div id="uebungen-liste"></div>
+    </section>
+
+    <!-- ---------- Spieltage ---------- -->
+    <section class="tab-section" id="tab-spieltage">
+      <div class="card">
+        <div class="card-header-row">
+          <h2>Spieltag als Leistungsnachweis</h2>
+          <button type="button" class="btn success small editor-only" id="btn-neuer-spieltag">+ Neuer Spieltag</button>
+        </div>
+        <p class="muted">Nach dem Spiel bewerten, wie weit die Schwerpunkte der Stufe bereits umgesetzt werden. Bewertet wird die Mannschaft, nicht der einzelne Spieler.</p>
+        <div class="form-field" style="max-width:320px;">
+          <label>Mannschaft</label>
+          <select id="spieltag-mannschaft"></select>
+        </div>
+        <p class="muted" id="spieltage-hinweis" style="margin-top:10px;"></p>
+      </div>
+      <div id="spieltag-editor"></div>
+      <div class="card" id="spieltage-liste-card">
+        <h2>Bisherige Spieltage</h2>
+        <div class="empty-state" id="spieltage-empty" style="display:none;">Für diese Mannschaft ist noch kein Spieltag erfasst.</div>
+        <div id="spieltage-rows"></div>
+      </div>
+    </section>
+
+    <!-- ---------- Auswertung ---------- -->
+    <section class="tab-section" id="tab-auswertung">
+      <div class="card">
+        <h2>Verlauf je Mannschaft</h2>
+        <p class="muted">Schwerpunkte gegen Spieltage. Jede Spalte ist ein Spiel, jede Zeile ein Schwerpunkt der Stufe.</p>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Mannschaft</label>
+            <select id="auswertung-mannschaft"></select>
+          </div>
+          <div class="form-field">
+            <label>Saison</label>
+            <select id="auswertung-saison"></select>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="empty-state" id="auswertung-empty" style="display:none;">Keine Spieltage für diese Auswahl.</div>
+        <div class="matrix-scroll" id="auswertung-matrix"></div>
+        <div class="ampel-legende" id="auswertung-legende"></div>
+      </div>
+    </section>
+
+    <!-- ---------- Verwaltung (Administrieren) ---------- -->
+    <section class="tab-section" id="tab-verwaltung">
+      <div class="card">
+        <h2>Verwaltung</h2>
+        <p class="muted">Bereiche, Stufen, Schwerpunkte, Übungen und Mannschaften pflegen.</p>
+        <div class="subnav" id="verwaltung-subnav">
+          <button type="button" data-vw="mannschaften" class="active">Mannschaften</button>
+          <button type="button" data-vw="stufen">Stufen</button>
+          <button type="button" data-vw="schwerpunkte">Schwerpunkte</button>
+          <button type="button" data-vw="uebungen">Übungen</button>
+          <button type="button" data-vw="bereiche">Bereiche</button>
+          <button type="button" data-vw="startbestand">Startbestand</button>
+        </div>
+      </div>
+      <div id="verwaltung-inhalt"></div>
+    </section>
+
+    <!-- ---------- Info ---------- -->
+    <section class="tab-section" id="tab-info">
+      <div class="card">
+        <h2>Über den Ausbildungsplan <span class="version-badge" id="version-badge-2"></span></h2>
+        <p class="muted">
+          Trainingsschwerpunkte und Trainingsinhalte für jede Altersklasse, dazu der
+          Spieltag als Leistungsnachweis. Fachliche Grundlage ist bereichsübergreifend
+          die Trainingsphilosophie Deutschland des DFB.
+        </p>
+        <div id="eckpfeiler-liste"></div>
+      </div>
+      <div class="card">
+        <h2>Aufbau einer idealen Trainingseinheit</h2>
+        <p class="muted">90 Minuten, vier Blöcke.</p>
+        <div id="einheit-liste"></div>
+      </div>
+      <div class="card">
+        <h2>Hinweis zur Altersklassen-Zuordnung</h2>
+        <p class="muted">
+          Der zugrunde liegende Vereins-Leitfaden bezeichnete die Juniorenstufen um eine
+          Stufe verschoben (er nannte die 12/13-Jährigen „E-Jugend“). Die Altersangaben
+          in Jahren waren korrekt, die Buchstaben nicht. In diesem Tool sind die Stufen
+          nach der offiziellen DFB-Nomenklatur benannt: D-Junioren sind U12/U13,
+          C-Junioren U14/U15 und so weiter. Wörtliche Zitate blieben unverändert.
+        </p>
+      </div>
+      <div class="card">
+        <h2>Änderungen</h2>
+        <div id="changelog-list"></div>
+      </div>
+      <div class="card">
+        <h3>Quelle</h3>
+        <p class="muted">
+          Trainingsphilosophie Deutschland — Deutscher Fußball-Bund (DFB), aufbereitet im
+          vereinseigenen Trainingsleitfaden G- bis A-Jugend (2026).
+        </p>
+      </div>
+      <div class="card">
+        <h3>Konto</h3>
+        <div class="btn-row" style="justify-content:flex-start;">
+          <a class="btn secondary small" href="https://tecko1985.github.io/ToolsUebersicht/">Zur Tools-Übersicht (an-/abmelden)</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Druckbereich -->
+<div id="print-area"><div id="print-content"></div></div>
+
+<script src="config.js?v=1.0"></script>
+<script src="seed.js?v=1.0"></script>
+<script src="db.js?v=1.0"></script>
+<script src="app.js?v=1.0"></script>
+</body>
+</html>
