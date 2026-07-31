@@ -373,6 +373,12 @@ table.matrix th.mx-schwerpunkt, table.matrix td.mx-schwerpunkt {
 table.matrix thead th { background: var(--gray); font-size: 12px; white-space: nowrap; }
 table.matrix td.mx-zelle { min-width: 42px; }
 
+/* ---------- Verlaufskurve (Jahrgangs-Auswertung) ---------- */
+
+.chart-scroll { overflow-x: auto; margin-bottom: 10px; }
+.verlauf-chart { display: block; }
+.verlauf-chart text { font-family: "Segoe UI", system-ui, sans-serif; }
+
 /* ---------- Verwaltung ---------- */
 
 .subnav { display: flex; gap: 6px; flex-wrap: wrap; }

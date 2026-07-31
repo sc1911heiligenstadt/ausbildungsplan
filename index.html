@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>🎯 Ausbildungsplan</title>
 <meta name="theme-color" content="#1a56a0" />
-<link rel="stylesheet" href="style.css?v=1.0" />
+<link rel="stylesheet" href="style.css?v=1.1" />
 </head>
 <body>
 
@@ -131,24 +131,28 @@
     <!-- ---------- Auswertung ---------- -->
     <section class="tab-section" id="tab-auswertung">
       <div class="card">
-        <h2>Verlauf je Mannschaft</h2>
-        <p class="muted">Schwerpunkte gegen Spieltage. Jede Spalte ist ein Spiel, jede Zeile ein Schwerpunkt der Stufe.</p>
+        <h2>Verlauf</h2>
+        <div class="subnav" id="auswertung-modus">
+          <button type="button" data-modus="mannschaft" class="active">Nach Mannschaft</button>
+          <button type="button" data-modus="jahrgang">Nach Jahrgang</button>
+        </div>
+        <p class="muted" id="auswertung-erklaerung" style="margin-top:12px;"></p>
         <div class="form-grid">
-          <div class="form-field">
+          <div class="form-field" id="feld-auswertung-mannschaft">
             <label>Mannschaft</label>
             <select id="auswertung-mannschaft"></select>
           </div>
-          <div class="form-field">
+          <div class="form-field" id="feld-auswertung-jahrgang" style="display:none;">
+            <label>Jahrgang</label>
+            <select id="auswertung-jahrgang"></select>
+          </div>
+          <div class="form-field" id="feld-auswertung-saison">
             <label>Saison</label>
             <select id="auswertung-saison"></select>
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="empty-state" id="auswertung-empty" style="display:none;">Keine Spieltage für diese Auswahl.</div>
-        <div class="matrix-scroll" id="auswertung-matrix"></div>
-        <div class="ampel-legende" id="auswertung-legende"></div>
-      </div>
+      <div id="auswertung-inhalt"></div>
     </section>
 
     <!-- ---------- Verwaltung (Administrieren) ---------- -->
@@ -222,9 +226,9 @@
 <!-- Druckbereich -->
 <div id="print-area"><div id="print-content"></div></div>
 
-<script src="config.js?v=1.0"></script>
+<script src="config.js?v=1.1"></script>
 <script src="seed.js?v=1.0"></script>
 <script src="db.js?v=1.0"></script>
-<script src="app.js?v=1.0"></script>
+<script src="app.js?v=1.1"></script>
 </body>
 </html>

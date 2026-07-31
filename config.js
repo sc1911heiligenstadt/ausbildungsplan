@@ -19,6 +19,21 @@ const SAISON_STICHTAG_MONAT = 7;
 
 const APP_CHANGELOG = [
   {
+    version: "1.1",
+    groups: [
+      {
+        title: "Den Jahrgang über die Jahre verfolgen",
+        items: [
+          "Jede Mannschaft trägt jetzt zusätzlich ihre Geburtsjahrgänge. Beim Anlegen eines Spieltag-Bogens werden sie vorbelegt und lassen sich für das einzelne Spiel ändern — etwa wenn ein Jahrgang einmal hoch- oder runterspielt.",
+          "Hintergrund: eine Mannschaftsbezeichnung wie „D1-Junioren“ meint jede Saison andere Kinder. Der Jahrgang bleibt dagegen derselbe und wandert über die Jahre durch die Stufen — der Jahrgang 2012 zum Beispiel spielt in der Saison 2026/27 als U15 bei den C-Junioren und ist erst vier Jahre später aus dem Juniorenbereich heraus.",
+          "Die Auswertung hat deshalb eine zweite Ansicht „Nach Jahrgang“ bekommen. Sie zeigt je Saison einen eigenen Block mit den Schwerpunkten, die damals galten — beim Wechsel von einer Stufe in die nächste tauschen die Schwerpunkte schließlich komplett.",
+          "Darüber steht eine durchgehende Kurve über alle Spieltage hinweg: der Umsetzungsgrad je Spiel, bei dem Grün voll zählt, Gelb halb und Rot nicht. Sie übersteht den Stufenwechsel und beantwortet damit die Frage, ob sich ein Jahrgang über die Jahre entwickelt. Gestrichelte Linien markieren den Saisonwechsel.",
+          "Beim Ausfüllen wird angezeigt, in welcher U-Klasse der eingetragene Jahrgang am Spieltag tatsächlich steht. Passt das nicht zur hinterlegten Stufe der Mannschaft, erscheint ein Hinweis — so fällt auf, wenn eine Mannschaftsbezeichnung stehengeblieben ist, während die Kinder weitergerückt sind."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.0",
     groups: [
       {

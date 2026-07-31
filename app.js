@@ -13,6 +13,8 @@ let currentMannschaftId = null; // Tab "Spieltage"
 let currentSpieltagId = null;   // offener Bogen
 let auswertungMannschaftId = null;
 let auswertungSaison = "";
+let auswertungModus = "mannschaft"; // "mannschaft" | "jahrgang"
+let auswertungJahrgang = null;
 let vwView = "mannschaften";
 let vwEditId = null;            // null = keine Bearbeitung, "neu" = neuer Datensatz
 
@@ -68,6 +70,73 @@ function saisonAusDatum(datum) {
   if (isNaN(d)) return "";
   const start = (d.getMonth() + 1) >= SAISON_STICHTAG_MONAT ? d.getFullYear() : d.getFullYear() - 1;
   return start + "/" + String(start + 1).slice(2);
+}
+
+// ---------- Jahrgänge ----------
+//
+// Der Jahrgang ist die Einheit, die man über Jahre verfolgt: er wandert durch die
+// Stufen, während die Mannschaftsbezeichnung ("D1-Junioren") stehenbleibt und jede
+// Saison andere Kinder meint. Deshalb trägt jeder Spieltag-Bogen zusätzlich die
+// beteiligten Jahrgänge.
+//
+// DFB-Regel: die Saison läuft vom 1. Juli bis 30. Juni, maßgeblich ist ihr ENDJAHR.
+// Jahrgang 2012 spielt in der Saison 2026/27 also als U15 (2027 − 2012).
+function uKlasseFuerJahrgang(jahrgang, datum) {
+  const j = Number(jahrgang);
+  const saison = saisonAusDatum(datum);
+  if (!j || !saison) return null;
+  return Number(saison.slice(0, 4)) + 1 - j;
+}
+
+function stufeFuerU(u) {
+  if (u === null || u === undefined) return null;
+  return stufenSortiert().find((st) => u >= Number(st.vonU) && u <= Number(st.bisU)) || null;
+}
+
+function stufeFuerJahrgang(jahrgang, datum) {
+  return stufeFuerU(uKlasseFuerJahrgang(jahrgang, datum));
+}
+
+// "2014, 2015" oder "2014 2015" -> [2014, 2015]. Alles Unplausible fliegt raus,
+// damit ein Tippfehler nicht als Jahrgang im Filter auftaucht.
+function jahrgaengeAusText(text) {
+  return Array.from(new Set(
+    String(text || "").split(/[^0-9]+/).map(Number).filter((n) => n >= 1990 && n <= 2100)
+  )).sort((a, b) => a - b);
+}
+
+function jahrgaengeText(liste) {
+  return (Array.isArray(liste) ? liste : []).join(", ");
+}
+
+function alleJahrgaenge() {
+  const s = new Set();
+  appData.mannschaften.forEach((m) => (m.jahrgaenge || []).forEach((j) => s.add(Number(j))));
+  appData.spieltage.forEach((sp) => (sp.jahrgaenge || []).forEach((j) => s.add(Number(j))));
+  return Array.from(s).sort((a, b) => b - a);
+}
+
+function spieltageFuerJahrgang(jahrgang) {
+  const j = Number(jahrgang);
+  return appData.spieltage
+    .filter((s) => Array.isArray(s.jahrgaenge) && s.jahrgaenge.map(Number).includes(j))
+    .sort((a, b) => String(a.datum || "").localeCompare(String(b.datum || "")));
+}
+
+// Umsetzungsgrad eines Bogens: grün zählt voll, gelb halb, rot nichts. "Nicht
+// beobachtet" geht NICHT in den Nenner ein — sonst sähe ein Bogen, in dem der
+// Trainer nur zwei Schwerpunkte beurteilt hat, schlechter aus als einer, in dem
+// er alle beurteilt hat.
+function umsetzungsgrad(spieltag) {
+  const werte = Object.values(spieltag.bewertungen || {}).filter(Boolean);
+  if (!werte.length) return null;
+  const punkte = werte.reduce((n, w) => n + (w === "gruen" ? 1 : w === "gelb" ? 0.5 : 0), 0);
+  return Math.round((punkte / werte.length) * 100);
+}
+
+function stufeFuerBogen(spieltag) {
+  const m = mannschaftById(spieltag.mannschaftId);
+  return m ? stufeById(m.stufeId) : null;
 }
 
 function trainingsartLabel(id) {
@@ -152,8 +221,17 @@ function normalizeData(data) {
   });
   d.spieltage.forEach((sp) => {
     if (!sp.bewertungen || typeof sp.bewertungen !== "object") sp.bewertungen = {};
+    // Bögen aus der Zeit vor der Jahrgangs-Achse haben das Feld nicht. Sie bleiben
+    // gültig und tauchen weiter in der Mannschafts-Auswertung auf, nur eben in
+    // keiner Jahrgangs-Auswertung — nichts wird geraten.
+    if (!Array.isArray(sp.jahrgaenge)) sp.jahrgaenge = [];
+    sp.jahrgaenge = sp.jahrgaenge.map(Number).filter((n) => n >= 1990 && n <= 2100);
   });
-  d.mannschaften.forEach((m) => { if (m.aktiv === undefined) m.aktiv = true; });
+  d.mannschaften.forEach((m) => {
+    if (m.aktiv === undefined) m.aktiv = true;
+    if (!Array.isArray(m.jahrgaenge)) m.jahrgaenge = [];
+    m.jahrgaenge = m.jahrgaenge.map(Number).filter((n) => n >= 1990 && n <= 2100);
+  });
   return d;
 }
 
@@ -524,8 +602,13 @@ function renderSpieltagEditor() {
           <label>Ergebnis (optional)</label>
           <input type="text" id="bogen-ergebnis" value="${escapeHtml(sp.ergebnis || "")}" placeholder="z.B. 3:1"${ro} />
         </div>
+        <div class="form-field">
+          <label>Beteiligte Jahrgänge</label>
+          <input type="text" id="bogen-jahrgaenge" value="${escapeHtml(jahrgaengeText(sp.jahrgaenge))}" placeholder="z.B. 2014, 2015"${ro} />
+        </div>
       </div>
       <p class="muted">Saison ${escapeHtml(saisonAusDatum(sp.datum))} — ergibt sich aus dem Datum, Stichtag 1. Juli.</p>
+      <p class="muted" id="bogen-jahrgang-hinweis">${escapeHtml(jahrgangHinweisText(sp, st))}</p>
     </div>
 
     <div class="card">
@@ -575,6 +658,18 @@ function renderSpieltagEditor() {
   bindFeld("bogen-gegner", (v) => { sp.gegner = v; });
   bindFeld("bogen-ergebnis", (v) => { sp.ergebnis = v; });
   bindFeld("bogen-fazit", (v) => { sp.fazit = v; });
+  // Der Hinweis zieht bei jeder Eingabe nach, damit ein Tippfehler im Jahrgang
+  // sofort auffaellt statt erst in der Auswertung zu fehlen.
+  const jgHinweisNachziehen = () => {
+    const el = document.getElementById("bogen-jahrgang-hinweis");
+    if (el) el.textContent = jahrgangHinweisText(sp, st);
+  };
+  document.getElementById("bogen-jahrgaenge").addEventListener("input", (e) => {
+    sp.jahrgaenge = jahrgaengeAusText(e.target.value);
+    jgHinweisNachziehen();
+    markDirty();
+  });
+  document.getElementById("bogen-datum").addEventListener("input", jgHinweisNachziehen);
   document.getElementById("bogen-heim").addEventListener("change", (e) => {
     sp.heim = e.target.value === "heim";
     markDirty();
@@ -599,11 +694,35 @@ function renderSpieltagEditor() {
   });
 }
 
+// Erklärt, welcher Jahrgang zum Spieldatum in welcher Stufe steht — und meldet,
+// wenn das nicht zur Stufe der Mannschaft passt. Genau dieser Fall tritt ein, wenn
+// eine Mannschaftsbezeichnung stehenbleibt, während die Kinder weitergerückt sind.
+function jahrgangHinweisText(spieltag, stufeDerMannschaft) {
+  const jg = (spieltag.jahrgaenge || []);
+  if (!jg.length) return "Ohne Jahrgang taucht dieser Bogen in keiner Jahrgangs-Auswertung auf.";
+  const teile = jg.map((j) => {
+    const u = uKlasseFuerJahrgang(j, spieltag.datum);
+    const st = stufeFuerU(u);
+    return `${j} spielt als U${u}${st ? " (" + st.name + ")" : ""}`;
+  });
+  const abweichend = stufeDerMannschaft && jg.some((j) => {
+    const st = stufeFuerJahrgang(j, spieltag.datum);
+    return st && st.id !== stufeDerMannschaft.id;
+  });
+  return teile.join(" · ") + (abweichend
+    ? ` — das passt nicht zur hinterlegten Stufe ${stufeDerMannschaft.name}. Bewertet werden trotzdem deren Schwerpunkte; ggf. die Stufe der Mannschaft in der Verwaltung nachziehen.`
+    : "");
+}
+
 function neuerSpieltag() {
   if (!canEdit() || !currentMannschaftId) return;
+  const mannschaft = mannschaftById(currentMannschaftId);
   const sp = {
     id: uuid(),
     mannschaftId: currentMannschaftId,
+    // Vorbelegung aus der Mannschaft — der Trainer soll nach dem Spiel nichts
+    // tippen muessen, was ohnehin feststeht.
+    jahrgaenge: mannschaft && Array.isArray(mannschaft.jahrgaenge) ? mannschaft.jahrgaenge.slice() : [],
     datum: heuteIso(),
     gegner: "",
     heim: true,
@@ -634,18 +753,108 @@ function loescheSpieltag(id) {
 
 // ---------- Tab: Auswertung ----------
 
-function renderAuswertung() {
-  const liste = fuelleMannschaftSelect("auswertung-mannschaft", auswertungMannschaftId || currentMannschaftId);
-  const matrixEl = document.getElementById("auswertung-matrix");
-  const emptyEl = document.getElementById("auswertung-empty");
-  const legendeEl = document.getElementById("auswertung-legende");
+function legendeHtml() {
+  return `<div class="ampel-legende">` +
+    AMPEL_STUFEN.map((a) => `<span><span class="ampel-punkt a-${escapeHtml(a.id)}"></span>${escapeHtml(a.label)}</span>`).join("") +
+    `<span><span class="ampel-punkt a-leer"></span>Nicht beobachtet</span></div>`;
+}
 
+function matrixHtml(schwerpunkte, spieltage) {
+  return `
+    <div class="matrix-scroll">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="mx-schwerpunkt">Schwerpunkt</th>
+            ${spieltage.map((s) => {
+              const gegner = s.gegner || "—";
+              const kurz = gegner.length > 12 ? gegner.slice(0, 11).trimEnd() + "…" : gegner;
+              return `<th title="${escapeHtml(fmtDatum(s.datum) + " gegen " + gegner)}">${escapeHtml(fmtDatumKurz(s.datum))}<br>${escapeHtml(kurz)}</th>`;
+            }).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${schwerpunkte.map((sp) => `
+            <tr>
+              <td class="mx-schwerpunkt">${escapeHtml(sp.titel)}</td>
+              ${spieltage.map((s) => {
+                const w = s.bewertungen[sp.id];
+                return `<td class="mx-zelle"><span class="ampel-punkt a-${escapeHtml(w || "leer")}" title="${escapeHtml(ampelLabel(w))}"></span></td>`;
+              }).join("")}
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// Durchgehende Linie des Umsetzungsgrades über ALLE Spieltage — die einzige
+// Darstellung, die einen Stufenwechsel übersteht, weil sie keine Schwerpunkt-Zeilen
+// vergleicht. Handgezeichnetes SVG: keine Bibliothek, läuft auch auf alten Geräten.
+function verlaufChartHtml(spieltage) {
+  const punkte = spieltage.map((s) => ({ s, wert: umsetzungsgrad(s) })).filter((p) => p.wert !== null);
+  if (punkte.length < 2) return "";
+  const w = Math.max(360, punkte.length * 58);
+  const h = 176, pl = 38, pr = 16, pt = 16, pb = 46;
+  const iw = w - pl - pr, ih = h - pt - pb;
+  const x = (i) => pl + (i * iw) / (punkte.length - 1);
+  const y = (v) => pt + ih - (v / 100) * ih;
+
+  const gitter = [0, 25, 50, 75, 100].map((v) => `
+    <line x1="${pl}" y1="${y(v).toFixed(1)}" x2="${w - pr}" y2="${y(v).toFixed(1)}" stroke="#dde1e8" stroke-width="1" />
+    <text x="${pl - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#6b7280">${v}</text>`).join("");
+
+  let trenner = `<text x="${pl + 3}" y="${pt + 11}" font-size="10" fill="#1a56a0">${escapeHtml(saisonAusDatum(punkte[0].s.datum))}</text>`;
+  punkte.forEach((p, i) => {
+    if (!i) return;
+    const vorher = saisonAusDatum(punkte[i - 1].s.datum), jetzt = saisonAusDatum(p.s.datum);
+    if (vorher === jetzt) return;
+    const mx = ((x(i - 1) + x(i)) / 2).toFixed(1);
+    trenner += `<line x1="${mx}" y1="${pt}" x2="${mx}" y2="${pt + ih}" stroke="#1a56a0" stroke-width="1" stroke-dasharray="4 3" />
+      <text x="${Number(mx) + 4}" y="${pt + 11}" font-size="10" fill="#1a56a0">${escapeHtml(jetzt)}</text>`;
+  });
+
+  const pfad = punkte.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.wert).toFixed(1)}`).join(" ");
+  const kreise = punkte.map((p, i) => `
+    <circle cx="${x(i).toFixed(1)}" cy="${y(p.wert).toFixed(1)}" r="4" fill="#1a56a0">
+      <title>${escapeHtml(fmtDatum(p.s.datum) + " gegen " + (p.s.gegner || "—") + ": " + p.wert + " %")}</title>
+    </circle>`).join("");
+  const beschriftung = punkte.map((p, i) => `
+    <text x="${x(i).toFixed(1)}" y="${h - 26}" text-anchor="middle" font-size="10" fill="#6b7280">${escapeHtml(fmtDatumKurz(p.s.datum))}</text>
+    <text x="${x(i).toFixed(1)}" y="${h - 13}" text-anchor="middle" font-size="10" fill="#1e2330">${p.wert}%</text>`).join("");
+
+  return `
+    <div class="chart-scroll">
+      <svg class="verlauf-chart" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img"
+           aria-label="Umsetzungsgrad je Spieltag in Prozent">
+        ${gitter}${trenner}
+        <path d="${pfad}" fill="none" stroke="#1a56a0" stroke-width="2" />
+        ${kreise}${beschriftung}
+      </svg>
+    </div>
+    <p class="muted">Umsetzungsgrad je Spieltag: grün zählt voll, gelb halb, rot nicht. Nicht beobachtete Schwerpunkte bleiben außen vor. Die gestrichelten Linien markieren den Saisonwechsel.</p>`;
+}
+
+function renderAuswertung() {
+  const jahrgangModus = auswertungModus === "jahrgang";
+  document.querySelectorAll("#auswertung-modus button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.modus === auswertungModus);
+  });
+  document.getElementById("feld-auswertung-mannschaft").style.display = jahrgangModus ? "none" : "";
+  document.getElementById("feld-auswertung-jahrgang").style.display = jahrgangModus ? "" : "none";
+  document.getElementById("feld-auswertung-saison").style.display = jahrgangModus ? "none" : "";
+  document.getElementById("auswertung-erklaerung").textContent = jahrgangModus
+    ? "Ein Jahrgang wandert über die Jahre durch die Stufen. Deshalb steht hier je Saison ein eigener Block mit den damals gültigen Schwerpunkten — darüber die durchgehende Kurve, die den Stufenwechsel übersteht."
+    : "Schwerpunkte gegen Spieltage. Jede Spalte ist ein Spiel, jede Zeile ein Schwerpunkt der Stufe.";
+  if (jahrgangModus) renderAuswertungJahrgang();
+  else renderAuswertungMannschaft();
+}
+
+function renderAuswertungMannschaft() {
+  const el = document.getElementById("auswertung-inhalt");
+  const liste = fuelleMannschaftSelect("auswertung-mannschaft", auswertungMannschaftId || currentMannschaftId);
   if (!liste.length) {
-    matrixEl.innerHTML = "";
-    legendeEl.innerHTML = "";
-    emptyEl.style.display = "block";
-    emptyEl.textContent = "Es ist noch keine aktive Mannschaft angelegt.";
     document.getElementById("auswertung-saison").innerHTML = "";
+    el.innerHTML = `<div class="card"><div class="empty-state">Es ist noch keine aktive Mannschaft angelegt.</div></div>`;
     return;
   }
   if (!auswertungMannschaftId || !liste.some((m) => m.id === auswertungMannschaftId)) {
@@ -667,42 +876,80 @@ function renderAuswertung() {
   const sps = st ? schwerpunkteFuerStufe(st.id, true) : [];
 
   if (!spieltage.length || !sps.length) {
-    matrixEl.innerHTML = "";
-    legendeEl.innerHTML = "";
-    emptyEl.style.display = "block";
-    emptyEl.textContent = !sps.length
+    el.innerHTML = `<div class="card"><div class="empty-state">${escapeHtml(!sps.length
       ? "Für die Stufe dieser Mannschaft sind noch keine Schwerpunkte hinterlegt."
-      : "Keine Spieltage für diese Auswahl.";
+      : "Keine Spieltage für diese Auswahl.")}</div></div>`;
     return;
   }
-  emptyEl.style.display = "none";
+  el.innerHTML = `<div class="card">${matrixHtml(sps, spieltage)}${legendeHtml()}</div>`;
+}
 
-  matrixEl.innerHTML = `
-    <table class="matrix">
-      <thead>
-        <tr>
-          <th class="mx-schwerpunkt">Schwerpunkt</th>
-          ${spieltage.map((s) => {
-            const gegner = s.gegner || "—";
-            const kurz = gegner.length > 12 ? gegner.slice(0, 11).trimEnd() + "…" : gegner;
-            return `<th title="${escapeHtml(fmtDatum(s.datum) + " gegen " + gegner)}">${escapeHtml(fmtDatumKurz(s.datum))}<br>${escapeHtml(kurz)}</th>`;
-          }).join("")}
-        </tr>
-      </thead>
-      <tbody>
-        ${sps.map((sp) => `
-          <tr>
-            <td class="mx-schwerpunkt">${escapeHtml(sp.titel)}</td>
-            ${spieltage.map((s) => {
-              const w = s.bewertungen[sp.id];
-              return `<td class="mx-zelle"><span class="ampel-punkt a-${escapeHtml(w || "leer")}" title="${escapeHtml(ampelLabel(w))}"></span></td>`;
-            }).join("")}
-          </tr>`).join("")}
-      </tbody>
-    </table>`;
+function renderAuswertungJahrgang() {
+  const el = document.getElementById("auswertung-inhalt");
+  const jgListe = alleJahrgaenge();
+  const sel = document.getElementById("auswertung-jahrgang");
+  if (!jgListe.length) {
+    sel.innerHTML = "";
+    el.innerHTML = `<div class="card"><div class="empty-state">
+      Noch kein Jahrgang hinterlegt. Jahrgänge werden an der Mannschaft gepflegt (Verwaltung) und beim Anlegen eines Spieltag-Bogens vorbelegt.
+    </div></div>`;
+    return;
+  }
+  sel.innerHTML = jgListe.map((j) => {
+    const u = uKlasseFuerJahrgang(j, heuteIso());
+    const st = stufeFuerU(u);
+    return `<option value="${j}">${j} — aktuell U${u}${st ? ", " + escapeHtml(st.name) : ""}</option>`;
+  }).join("");
+  if (!auswertungJahrgang || !jgListe.includes(Number(auswertungJahrgang))) auswertungJahrgang = jgListe[0];
+  sel.value = String(auswertungJahrgang);
 
-  legendeEl.innerHTML = AMPEL_STUFEN.map((a) => `<span><span class="ampel-punkt a-${escapeHtml(a.id)}"></span>${escapeHtml(a.label)}</span>`).join("") +
-    `<span><span class="ampel-punkt a-leer"></span>Nicht beobachtet</span>`;
+  const spieltage = spieltageFuerJahrgang(auswertungJahrgang);
+  if (!spieltage.length) {
+    el.innerHTML = `<div class="card"><div class="empty-state">Für den Jahrgang ${escapeHtml(auswertungJahrgang)} ist noch kein Spieltag erfasst.</div></div>`;
+    return;
+  }
+
+  // Je Saison ein Block, innerhalb der Saison je Stufe einer — spielt ein Jahrgang
+  // in einer Saison in zwei Mannschaften verschiedener Stufen, wäre eine gemeinsame
+  // Matrix aus Zeilen gebaut, die nichts miteinander zu tun haben.
+  const bloecke = [];
+  spieltage.forEach((sp) => {
+    const saison = saisonAusDatum(sp.datum);
+    const st = stufeFuerBogen(sp);
+    const key = saison + "|" + (st ? st.id : "-");
+    let block = bloecke.find((b) => b.key === key);
+    if (!block) { block = { key, saison, stufe: st, spieltage: [] }; bloecke.push(block); }
+    block.spieltage.push(sp);
+  });
+  bloecke.reverse(); // neueste Saison zuerst
+
+  const uJetzt = uKlasseFuerJahrgang(auswertungJahrgang, heuteIso());
+  const stJetzt = stufeFuerU(uJetzt);
+
+  el.innerHTML = `
+    <div class="card">
+      <h2>Jahrgang ${escapeHtml(auswertungJahrgang)}</h2>
+      <p class="muted">In der laufenden Saison ${escapeHtml(saisonAusDatum(heuteIso()))} als <strong>U${uJetzt}</strong>${stJetzt ? " in der Stufe " + escapeHtml(stJetzt.name) : ""} — ${spieltage.length} erfasste Spieltage über ${bloecke.length} Saison-Abschnitt${bloecke.length === 1 ? "" : "e"}.</p>
+      ${verlaufChartHtml(spieltage) || `<p class="muted">Die Verlaufskurve erscheint, sobald mindestens zwei Spieltage bewertet sind.</p>`}
+    </div>
+    ${bloecke.map((b) => {
+      const sps = b.stufe ? schwerpunkteFuerStufe(b.stufe.id, true) : [];
+      const mannschaften = Array.from(new Set(b.spieltage.map((s) => {
+        const m = mannschaftById(s.mannschaftId);
+        return m ? m.name : "unbekannte Mannschaft";
+      })));
+      return `
+        <div class="card">
+          <div class="card-header-row">
+            <h2>Saison ${escapeHtml(b.saison)}${b.stufe ? " — " + escapeHtml(stufeLabel(b.stufe)) : ""}</h2>
+            <span class="tag">${b.spieltage.length} Spieltag${b.spieltage.length === 1 ? "" : "e"}</span>
+          </div>
+          <p class="muted">Gespielt als ${escapeHtml(mannschaften.join(", "))}.</p>
+          ${sps.length
+            ? matrixHtml(sps, b.spieltage) + legendeHtml()
+            : `<div class="empty-state">Für diese Stufe sind keine Schwerpunkte hinterlegt.</div>`}
+        </div>`;
+    }).join("")}`;
 }
 
 // ---------- Tab: Verwaltung ----------
@@ -817,27 +1064,52 @@ function vwMannschaftenHtml() {
   const zeilen = mannschaftenSortiert(false).map((m) => {
     const st = stufeById(m.stufeId);
     const anzahl = spieltageFuerMannschaft(m.id).length;
+    const jg = (m.jahrgaenge || []).length ? "Jahrgang " + jahrgaengeText(m.jahrgaenge) : "kein Jahrgang hinterlegt";
     return vwZeileHtml(m.id, m.name + (m.aktiv === false ? " (inaktiv)" : ""),
-      `${st ? stufeLabel(st) : "keine Stufe zugeordnet"} · ${anzahl} Spieltag${anzahl === 1 ? "" : "e"}`);
+      `${st ? stufeLabel(st) : "keine Stufe zugeordnet"} · ${jg} · ${anzahl} Spieltag${anzahl === 1 ? "" : "e"}`);
   });
-  let html = vwListeHtml("Mannschaften", "Jede Mannschaft hängt an einer Juniorenstufe — daraus ergeben sich die Schwerpunkte im Spieltag-Bogen. Eine Stufe darf mehrere Mannschaften haben.", zeilen, "+ Neue Mannschaft");
+  let html = vwListeHtml("Mannschaften",
+    "Die Stufe bestimmt, welche Schwerpunkte im Spieltag-Bogen stehen. Die Jahrgänge bestimmen, welcher Kohorte ein Bogen zugerechnet wird — sie werden beim Anlegen eines Bogens vorbelegt und wandern über die Jahre mit.",
+    zeilen, "+ Neue Mannschaft");
   if (vwEditId) {
-    const m = vwEditId === "neu" ? { name: "", stufeId: (stufenSortiert()[0] || {}).id, aktiv: true } : mannschaftById(vwEditId);
+    const m = vwEditId === "neu"
+      ? { name: "", stufeId: (stufenSortiert()[0] || {}).id, jahrgaenge: [], aktiv: true }
+      : mannschaftById(vwEditId);
     if (m) {
+      const st = stufeById(m.stufeId);
+      const vorschlag = st ? vorschlagJahrgaenge(st) : [];
       html += vwFormularHtml(vwEditId === "neu" ? "Neue Mannschaft" : "Mannschaft bearbeiten", [
         vwFeld("Name", "vw-name", m.name, "text"),
         vwFeld("Juniorenstufe", "vw-stufeId", m.stufeId, "select", stufenSortiert().map((s) => ({ id: s.id, label: stufeLabel(s) }))),
+        vwFeld("Jahrgänge", "vw-jahrgaenge", jahrgaengeText(m.jahrgaenge), "text"),
         vwFeld("Aktiv", "vw-aktiv", m.aktiv !== false, "checkbox")
-      ]);
+      ], `<p class="muted" id="vw-jahrgang-hinweis">${vorschlag.length
+            ? `In der laufenden Saison spielt die ${escapeHtml(st.name)} den Jahrgang ${escapeHtml(vorschlag.join(", "))}. Mehrere durch Komma trennen.`
+            : "Mehrere Jahrgänge durch Komma trennen, z.B. 2014, 2015."}</p>`);
     }
   }
   return html;
 }
 
+// Welche Geburtsjahrgänge spielen in der laufenden Saison in dieser Stufe?
+// Umkehrung von uKlasseFuerJahrgang: Jahrgang = Saison-Endjahr − U-Klasse.
+function vorschlagJahrgaenge(stufe) {
+  const saison = saisonAusDatum(heuteIso());
+  if (!saison || !stufe || stufe.vonU === null || stufe.vonU === undefined) return [];
+  const endjahr = Number(saison.slice(0, 4)) + 1;
+  const jg = [];
+  for (let u = Number(stufe.vonU); u <= Number(stufe.bisU); u++) jg.push(endjahr - u);
+  return jg.sort((a, b) => a - b);
+}
+
 function speichereMannschaft() {
   const name = String(vwWert("vw-name")).trim();
   if (!name) { alert("Bitte einen Namen angeben."); return false; }
-  const daten = { name, stufeId: vwWert("vw-stufeId"), aktiv: !!vwWert("vw-aktiv") };
+  const daten = {
+    name, stufeId: vwWert("vw-stufeId"),
+    jahrgaenge: jahrgaengeAusText(vwWert("vw-jahrgaenge")),
+    aktiv: !!vwWert("vw-aktiv")
+  };
   return vwUebernehmen(appData.mannschaften, daten);
 }
 
@@ -1346,6 +1618,16 @@ async function init() {
   });
   document.getElementById("auswertung-saison").addEventListener("change", (e) => {
     auswertungSaison = e.target.value;
+    renderAuswertung();
+  });
+  document.getElementById("auswertung-jahrgang").addEventListener("change", (e) => {
+    auswertungJahrgang = Number(e.target.value);
+    renderAuswertung();
+  });
+  document.getElementById("auswertung-modus").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-modus]");
+    if (!b) return;
+    auswertungModus = b.dataset.modus;
     renderAuswertung();
   });
   document.getElementById("btn-seed-direkt").addEventListener("click", () => {
