@@ -318,12 +318,6 @@ function setupTabs() {
   document.querySelectorAll("nav button[data-tab]").forEach((b) => {
     b.addEventListener("click", () => activateTab(b.dataset.tab));
   });
-  const badge = document.getElementById("version-badge");
-  const openHistory = () => activateTab("info");
-  badge.addEventListener("click", openHistory);
-  badge.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openHistory(); }
-  });
 }
 
 // ---------- Tab: Ausbildung ----------
@@ -1571,7 +1565,6 @@ function showConnectScreen(errorMsg) {
 }
 
 async function init() {
-  document.getElementById("version-badge").textContent = "v" + APP_VERSION;
   document.getElementById("version-badge-2").textContent = "v" + APP_VERSION;
   renderChangelog();
   renderInfoStatisch();
