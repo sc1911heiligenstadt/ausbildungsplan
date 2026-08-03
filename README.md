@@ -7,7 +7,7 @@ als Leistungsnachweis.
 Fachliche Grundlage ist bereichsübergreifend die **Trainingsphilosophie
 Deutschland** des DFB.
 
-Live: https://tecko1985.github.io/ausbildungsplan/
+Live: https://sc1911heiligenstadt.github.io/ausbildungsplan/
 
 ## Was das Tool kann
 
