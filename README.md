@@ -1,57 +1,23 @@
-# Ausbildungsplan
+# 🎯 Ausbildungsplan
 
-Trainingsschwerpunkte und Trainingsinhalte für jede Altersklasse der
-Nachwuchsabteilung des 1. SC 1911 e.V. Heilbad Heiligenstadt — dazu der Spieltag
-als Leistungsnachweis.
+Trainingsschwerpunkte und passende Übungen für jede Altersklasse von den Bambini bis zur U23, auf Grundlage der Trainingsphilosophie Deutschland — dazu der Spieltag als Leistungsnachweis: nach dem Spiel wird je Mannschaft auf einer Ampel bewertet, wie weit das Erlernte bereits umgesetzt wird. Die Auswertung folgt wahlweise der Mannschaft oder dem Geburtsjahrgang, sodass sich die Entwicklung einer Kohorte über mehrere Jahre und Altersstufen hinweg verfolgen lässt.
 
-Fachliche Grundlage ist bereichsübergreifend die **Trainingsphilosophie
-Deutschland** des DFB.
+**➡️ [Ausbildungsplan öffnen](https://sc1911heiligenstadt.github.io/ausbildungsplan/)**
 
-Live: https://sc1911heiligenstadt.github.io/ausbildungsplan/
+## Zugang
 
-## Was das Tool kann
+Die Anmeldung läuft über die [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) — dort einmal anmelden, danach ist dieses Werkzeug offen.
 
-**Ausbildung** — Für jede Juniorenstufe von den Bambini bis zur U23 stehen die
-Trainingsschwerpunkte mit den zugehörigen Übungen bereit. Die Stufe wird über die
-U-Mannschaft gefunden. Jede Stufe zeigt ihr Profil: Altersspanne,
-Entwicklungsstand, DFB-Obergrenze für die Spielform, Mindest-Nettospielzeit und
-Trainingsfrequenz (zwei Mannschaftstrainings plus Fördertraining, bis U11
-freiwillig).
+Die Rechte gelten in drei Stufen: **Sehen** (nur ansehen), **Bearbeiten** (Einträge pflegen) und **Administrieren** (Einstellungen und Verwaltung). Wer welche Stufe hat, legt die Tools-Übersicht fest.
 
-**Übungen** — Gemeinsamer Katalog, gegliedert nach den vier Säulen der
-Trainingsphilosophie: Gleichzahlspiele, Spiele mit Anspielern, eine Linie
-verteidigen, Über-/Unterzahlspiele. Filterbar nach Säule, Trainingsart und
-Altersklasse; eine Übung darf an mehreren Schwerpunkten und Stufen hängen. Liegt
-sie über der DFB-Obergrenze der betrachteten Stufe, wird sie markiert.
+## Lokal starten
 
-**Spieltage** — Nach jedem Spiel wird je Mannschaft ein Bogen ausgefüllt: Datum,
-Gegner, Heim/Auswärts, Ergebnis und Fazit. Auf einer Ampel wird bewertet, wie weit
-die Schwerpunkte der Stufe im Spiel bereits umgesetzt waren. Bewertet wird die
-Mannschaft, nicht der einzelne Spieler.
-
-**Auswertung** — Je Mannschaft eine Matrix aus Schwerpunkten und Spieltagen. Die
-Saison ergibt sich aus dem Spieldatum, Stichtag ist der 1. Juli.
-
-**Druckansicht** — Stufenprofil, alle Schwerpunkte und die vollständigen
-Übungsbeschreibungen auf Papier für den Platz.
-
-## Rechte
-
-| Stufe | Darf |
-|---|---|
-| Sehen | Alle Stufen, Schwerpunkte und Übungen lesen — schreibgeschützt |
-| Bearbeiten | Spieltag-Bögen anlegen und ausfüllen, Druckansicht nutzen |
-| Administrieren | Bereiche, Stufen, Schwerpunkte, Übungen und Mannschaften pflegen, Startbestand einspielen |
-
-Der Info-Tab ist immer für alle sichtbar.
+Über den Eintrag `ausbildungsplan` in `E:\.claude\launch.json` — der Server läuft dann auf `http://localhost:8811/`.
 
 ## Technik
 
-Vanilla JavaScript ohne Build-Step. Anmeldung und Speicherung laufen über das
-zentrale Login-Gateway der Tools-Übersicht; die Daten liegen als einzelne
-JSON-Datei in der Vereins-Nextcloud.
+Vanilla JavaScript ohne Build-Schritt — die Dateien werden so ausgeliefert, wie sie im Repo liegen. Veröffentlicht über GitHub Pages. Die Daten liegen in der Vereins-Nextcloud; der Zugriff läuft ausschließlich über den Login-Worker der Tools-Übersicht, nie mit Zugangsdaten im Browser.
 
-## Quelle
+---
 
-Trainingsphilosophie Deutschland — Deutscher Fußball-Bund (DFB), aufbereitet im
-vereinseigenen Trainingsleitfaden G- bis A-Jugend (2026).
+Ein Werkzeug des 1. SC 1911 Heiligenstadt. Alle Werkzeuge auf einen Blick: [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) · Erklärungen im [Toolbox Wiki](https://sc1911heiligenstadt.github.io/Vereinswiki/).
