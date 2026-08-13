@@ -19,6 +19,20 @@ const SAISON_STICHTAG_MONAT = 7;
 
 const APP_CHANGELOG = [
   {
+    version: "1.1",
+    groups: [
+      {
+        title: "Mannschaften kommen jetzt aus der einen Vereinsliste",
+        items: [
+          "Beim Anlegen einer Mannschaft schlägt das Namensfeld die echten Mannschaften des Vereins vor — dieselbe Liste, die in der Tools-Übersicht gepflegt wird.",
+          "Wird ein Name von dort gewählt, stellt sich die Juniorenstufe von selbst richtig ein: aus „D2“ wird die Stufe D-Junioren. Wer die Stufe von Hand ändert, behält seine Eingabe — der Vorschlag überschreibt sie nicht.",
+          "Ein eigener Name bleibt möglich: Trainingsgruppen ohne eigene Mannschaft lassen sich weiterhin frei eintippen.",
+          "Die Mannschaften bleiben in dieser App gespeichert — an ihnen hängen Stufe, Jahrgänge und alle Spieltag-Bögen. Die Vereinsliste ist ein Vorschlag, keine Vorschrift."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.0",
     groups: [
       {

@@ -16,6 +16,10 @@ let auswertungSaison = "";
 let auswertungModus = "mannschaft"; // "mannschaft" | "jahrgang"
 let auswertungJahrgang = null;
 let vwView = "mannschaften";
+// Die Mannschaften des Vereins aus der zentralen Liste — Vorschläge fürs
+// Namensfeld im Mannschafts-Formular. Leer, bis fetchVereinsMannschaften()
+// durch ist; das Formular ist auch ohne sie voll bedienbar.
+let vereinsMannschaften = [];
 let vwEditId = null;            // null = keine Bearbeitung, "neu" = neuer Datensatz
 
 function canEdit() { return currentIsAdmin || currentCanEdit; }   // Bögen ausfüllen, drucken
@@ -961,6 +965,17 @@ function vwFeld(label, id, wert, typ, optionen) {
     return `<div class="form-field"><label>${escapeHtml(label)}</label>
       <div class="checkbox-zeile"><input type="checkbox" id="${id}"${wert ? " checked" : ""} /><span class="cbz-text">ja</span></div></div>`;
   }
+  if (typ === "datalist") {
+    // ⚠️ Die datalist steht IM Formular, nicht einmalig in der index.html:
+    // #verwaltung-inhalt wird bei jedem Render komplett neu gebaut, eine
+    // außerhalb liegende Liste wäre beim ersten Öffnen noch leer gewesen.
+    // Freitext bleibt möglich — eine datalist schlägt vor, sie verbietet nicht.
+    const opts = (optionen || [])
+      .map((o) => `<option value="${escapeHtml(o.id)}">${escapeHtml(o.label)}</option>`).join("");
+    return `<div class="form-field"><label>${escapeHtml(label)}</label>
+      <input type="text" id="${id}" list="${id}-liste" autocomplete="off" value="${escapeHtml(wert === null || wert === undefined ? "" : wert)}" />
+      <datalist id="${id}-liste">${opts}</datalist></div>`;
+  }
   const t = typ === "number" ? "number" : "text";
   return `<div class="form-field"><label>${escapeHtml(label)}</label><input type="${t}" id="${id}" value="${escapeHtml(wert === null || wert === undefined ? "" : wert)}" /></div>`;
 }
@@ -1011,6 +1026,48 @@ function renderVerwaltung() {
   if (vwView === "schwerpunkte") { el.innerHTML = vwSchwerpunkteHtml(); }
   if (vwView === "uebungen") { el.innerHTML = vwUebungenHtml(); }
   bindeStufenwechselImSchwerpunkt();
+  bindeMannschaftAusVereinsliste();
+}
+
+// Wird im Mannschafts-Formular ein Name aus der Vereinsliste gewählt, zieht die
+// Juniorenstufe mit. Die zentrale Liste leitet den Buchstaben aus dem Kurznamen
+// ab ("B2" → "b"), und die Stufen dieser App tragen genau diese Ids (seed.js).
+//
+// ⚠️ Zieht NUR nach, solange niemand die Stufe von Hand angefasst hat. Ein
+// Verein hat Fälle, in denen die Mannschaftsbezeichnung nicht zur Stufe passt
+// (eine D2, die als Jahrgang hochspielt) — eine Handeingabe darf ein späterer
+// Tastendruck im Namensfeld nicht wieder wegräumen. Gleiche Linie wie die
+// Liga-Automatik im Busplan.
+function bindeMannschaftAusVereinsliste() {
+  if (vwView !== "mannschaften") return;
+  const nameFeld = document.getElementById("vw-name");
+  const stufeFeld = document.getElementById("vw-stufeId");
+  if (!nameFeld || !stufeFeld) return;
+
+  let stufeVonHand = false;
+  stufeFeld.addEventListener("change", () => { stufeVonHand = true; });
+
+  nameFeld.addEventListener("input", () => {
+    if (stufeVonHand) return;
+    const treffer = vereinsMannschaften.find(
+      (v) => v.kurz.toLowerCase() === nameFeld.value.trim().toLowerCase()
+    );
+    if (!treffer || !treffer.stufe) return;
+    // Nur setzen, wenn es die Stufe hier auch wirklich gibt: "herren" und
+    // "sonstige" kennt der Ausbildungsplan nicht, der endet im Juniorenbereich.
+    const stufe = stufeById(treffer.stufe);
+    if (!stufe) return;
+    stufeFeld.value = treffer.stufe;
+    // Der Jahrgangs-Hinweis nennt die Stufe beim Namen — er hängt an keinem
+    // Listener und stünde sonst mit der alten Stufe daneben.
+    const hinweis = document.getElementById("vw-jahrgang-hinweis");
+    if (hinweis) {
+      const jg = vorschlagJahrgaenge(stufe);
+      hinweis.textContent = jg.length
+        ? `In der laufenden Saison spielt die ${stufe.name} den Jahrgang ${jg.join(", ")}. Mehrere durch Komma trennen.`
+        : "Mehrere Jahrgänge durch Komma trennen, z.B. 2014, 2015.";
+    }
+  });
 }
 
 function vwListeHtml(titel, hinweis, zeilen, neuLabel) {
@@ -1073,7 +1130,10 @@ function vwMannschaftenHtml() {
       const st = stufeById(m.stufeId);
       const vorschlag = st ? vorschlagJahrgaenge(st) : [];
       html += vwFormularHtml(vwEditId === "neu" ? "Neue Mannschaft" : "Mannschaft bearbeiten", [
-        vwFeld("Name", "vw-name", m.name, "text"),
+        vwFeld("Name", "vw-name", m.name, "datalist", vereinsMannschaften.map((v) => ({
+          id: v.kurz,
+          label: v.lang + (v.liga ? " · " + v.liga : "")
+        }))),
         vwFeld("Juniorenstufe", "vw-stufeId", m.stufeId, "select", stufenSortiert().map((s) => ({ id: s.id, label: stufeLabel(s) }))),
         vwFeld("Jahrgänge", "vw-jahrgaenge", jahrgaengeText(m.jahrgaenge), "text"),
         vwFeld("Aktiv", "vw-aktiv", m.aktiv !== false, "checkbox")
@@ -1653,6 +1713,14 @@ async function init() {
       ? `${currentVorname || ""} ${currentNachname || ""}`.trim() : currentUsername;
     el.textContent = "👤 " + name + (currentIsAdmin ? " (Admin)" : "");
     renderAlles();
+    // Kommt zum Schluss: die Liste füllt nur das Vorschlagsfeld im
+    // Mannschafts-Formular, der Ausbildungsplan ist ohne sie schon vollständig.
+    // Danach einmal nachzeichnen, falls die Verwaltung schon offen steht.
+    vereinsMannschaften = await fetchVereinsMannschaften();
+    // ⚠️ NICHT nachzeichnen, solange ein Formular offen ist: renderVerwaltung()
+    // baut #verwaltung-inhalt komplett neu und würde getippte, noch nicht
+    // gespeicherte Eingaben wegwerfen.
+    if (vereinsMannschaften.length && !vwEditId) renderVerwaltung();
   } catch (e) {
     if (e instanceof NotLoggedInError) showConnectScreen();
     else showConnectScreen("Fehler beim Laden: " + e.message);
