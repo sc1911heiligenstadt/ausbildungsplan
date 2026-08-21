@@ -1547,7 +1547,7 @@ function druckeStufe() {
   const sps = schwerpunkteFuerStufe(st.id, true);
   document.getElementById("print-content").innerHTML = `
     <h1>Ausbildungsplan — ${escapeHtml(stufeLabel(st))}</h1>
-    <p class="print-meta">1. SC 1911 e.V. Heilbad Heiligenstadt · Stand ${escapeHtml(new Date().toLocaleDateString("de-DE"))} · Grundlage: Trainingsphilosophie Deutschland (DFB)</p>
+    <p class="print-meta">1. SC 1911 Heiligenstadt e.V. · Stand ${escapeHtml(new Date().toLocaleDateString("de-DE"))} · Grundlage: Trainingsphilosophie Deutschland (DFB)</p>
     <table class="print-profil">
       ${profil.map((z) => `<tr><td class="pp-label">${escapeHtml(z[0])}</td><td>${escapeHtml(z[1])}</td></tr>`).join("")}
     </table>
