@@ -19,6 +19,17 @@ const SAISON_STICHTAG_MONAT = 7;
 
 const APP_CHANGELOG = [
   {
+    version: "1.3",
+    groups: [
+      {
+        title: "Der richtige Vereinsname",
+        items: [
+          "Im Ausdruck des Ausbildungsplans stand unten „1. SC 1911 e.V. Heilbad Heiligenstadt“. Der Verein heißt aber „1. SC 1911 Heiligenstadt e.V.“ — so steht er auch in den Teilnahmebedingungen. Der Ausdruck trägt jetzt den richtigen Namen."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.2",
     groups: [
       {
