@@ -17,12 +17,13 @@ wird auf einer Ampel bewertet, wie weit die Schwerpunkte umgesetzt wurden.
 | **Spieltage** | Nach jedem Spiel ein Bogen je Mannschaft: Datum, Gegner, Heim oder Auswärts, Ergebnis, Fazit — und die Ampel-Bewertung der Schwerpunkte |
 | **Auswertung** | Je Mannschaft eine Matrix aus Schwerpunkten und Spieltagen; zusätzlich die Ansicht **Nach Jahrgang** über mehrere Saisons hinweg |
 | **Verwaltung** | Bereiche, Stufen, Schwerpunkte, Übungen und Mannschaften pflegen, Startbestand einspielen |
+| **Info** | Was die App tut, der Aufbau einer idealen Trainingseinheit, die Änderungen und der Datenschutz-Hinweis |
 
 ## Die Stufe findet sich selbst
 
 Beim Anlegen einer Mannschaft schlägt das Namensfeld die echten Mannschaften des
 Vereins vor — dieselbe Liste, die in der Tools-Übersicht gepflegt wird. Wird ein
-Name von dort gewählt, stellt sich die Juniorenstufe von selbst ein: aus „D2"
+Name von dort gewählt, stellt sich die Juniorenstufe von selbst ein: aus „D2“
 wird die Stufe D-Junioren. Wer die Stufe von Hand ändert, behält seine Eingabe.
 Eigene Namen für Trainingsgruppen ohne Mannschaft bleiben möglich.
 
@@ -31,7 +32,7 @@ sichtbar markiert.
 
 ## Den Jahrgang über die Jahre verfolgen
 
-Eine Bezeichnung wie „D1-Junioren" meint jede Saison andere Kinder. Der
+Eine Bezeichnung wie „D1-Junioren“ meint jede Saison andere Kinder. Der
 **Jahrgang** dagegen bleibt derselbe und wandert über die Jahre durch die Stufen
 — der Jahrgang 2012 spielt in der Saison 2026/27 als U15 bei den C-Junioren.
 

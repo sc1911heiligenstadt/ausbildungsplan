@@ -19,54 +19,6 @@ const SAISON_STICHTAG_MONAT = 7;
 
 const APP_CHANGELOG = [
   {
-    version: "1.4",
-    groups: [
-      {
-        title: "Beim Sitzungsende wird der Bildschirm geräumt",
-        items: [
-          "Lief die Anmeldung ab, während die App offen war, blieb der Ausbildungsplan im Browser stehen — unsichtbar, im Seitenquelltext aber weiter lesbar. Jetzt wird alles entfernt: die Seite, die Druckansicht und der eigene Name oben rechts.",
-          "Bisher blieb die App bei einer abgelaufenen Anmeldung einfach offen stehen und meldete den Fehler nur nebenbei. Jetzt führt jeder Weg auf den Anmelde-Hinweis."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.3",
-    groups: [
-      {
-        title: "Der richtige Vereinsname",
-        items: [
-          "Im Ausdruck des Ausbildungsplans stand unten „1. SC 1911 e.V. Heilbad Heiligenstadt“. Der Verein heißt aber „1. SC 1911 Heiligenstadt e.V.“ — so steht er auch in den Teilnahmebedingungen. Der Ausdruck trägt jetzt den richtigen Namen."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.2",
-    groups: [
-      {
-        title: "Am Handy",
-        items: [
-          "Bisher brach die Reiterleiste selbst um, die rechte Reiter-Gruppe darin aber nicht: Sie rutschte als ein Stück in die zweite Zeile und lief dort weiter über den rechten Rand hinaus. Jetzt bricht auch sie um, sobald sie zu breit wird. Zu sehen ist das nur, wenn genug Reiter nebeneinanderstehen — bis dahin sieht alles aus wie bisher."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.1",
-    groups: [
-      {
-        title: "Mannschaften kommen jetzt aus der einen Vereinsliste",
-        items: [
-          "Beim Anlegen einer Mannschaft schlägt das Namensfeld die echten Mannschaften des Vereins vor — dieselbe Liste, die in der Tools-Übersicht gepflegt wird.",
-          "Wird ein Name von dort gewählt, stellt sich die Juniorenstufe von selbst richtig ein: aus „D2“ wird die Stufe D-Junioren. Wer die Stufe von Hand ändert, behält seine Eingabe — der Vorschlag überschreibt sie nicht.",
-          "Ein eigener Name bleibt möglich: Trainingsgruppen ohne eigene Mannschaft lassen sich weiterhin frei eintippen.",
-          "Die Mannschaften bleiben in dieser App gespeichert — an ihnen hängen Stufe, Jahrgänge und alle Spieltag-Bögen. Die Vereinsliste ist ein Vorschlag, keine Vorschrift."
-        ]
-      }
-    ]
-  },
-  {
     version: "1.0",
     groups: [
       {
@@ -87,6 +39,15 @@ const APP_CHANGELOG = [
           "Auf einer Ampel wird bewertet, wie weit die Schwerpunkte der Stufe im Spiel umgesetzt wurden. Nicht bewertete Schwerpunkte gelten als nicht beobachtet.",
           "Bewertet wird die Mannschaft, nicht der einzelne Spieler — die Einzelbewertung bleibt Aufgabe des Spielertools.",
           "Die Auswertung zeigt je Mannschaft eine Matrix aus Schwerpunkten und Spieltagen, sodass der Verlauf über die Saison auf einen Blick erkennbar ist. Die Saison ergibt sich aus dem Spieldatum, Stichtag ist der 1. Juli."
+        ]
+      },
+      {
+        title: "Mannschaften anlegen",
+        items: [
+          "Das Namensfeld schlägt die echten Mannschaften des Vereins vor — dieselbe Liste, die in der Tools-Übersicht gepflegt wird.",
+          "Wird ein Name von dort gewählt, stellt sich die Juniorenstufe von selbst richtig ein: aus „D2“ wird die Stufe D-Junioren. Wer die Stufe von Hand ändert, behält seine Eingabe — der Vorschlag überschreibt sie nicht.",
+          "Ein eigener Name bleibt möglich: Trainingsgruppen ohne eigene Mannschaft lassen sich frei eintippen.",
+          "Die Mannschaften bleiben in dieser App gespeichert — an ihnen hängen Stufe, Jahrgänge und alle Spieltag-Bögen. Die Vereinsliste ist ein Vorschlag, keine Vorschrift."
         ]
       },
       {
@@ -112,6 +73,7 @@ const APP_CHANGELOG = [
         title: "Bedienung am Handy",
         items: [
           "Die Ansicht ist für das Handy gebaut — der Spieltag-Bogen lässt sich direkt am Platz ausfüllen.",
+          "Die Reiterleiste bricht am Handy um, statt seitlich aus dem Bild zu laufen — auch die hinteren Reiter sind auf schmalen Bildschirmen erreichbar.",
           "Eingabefelder sind mindestens 16 Pixel groß, damit der iPhone-Browser beim Antippen nicht ungefragt in die Seite hineinzoomt und verschoben stehen bleibt."
         ]
       },
@@ -119,6 +81,7 @@ const APP_CHANGELOG = [
         title: "Daten & Speicherung",
         items: [
           "Gespeichert wird in der Vereins-Nextcloud über die zentrale Anmeldung der Tools-Übersicht — ein eigenes Passwort braucht es nicht.",
+          "Läuft die Anmeldung ab, während die App offen ist, wird der Bildschirm geräumt: Ausbildungsplan, Druckansicht und der eigene Name oben rechts verschwinden, und jeder Weg führt auf den Anmelde-Hinweis. Es bleibt nichts im Seitenquelltext zurück.",
           "Ändern zwei Geräte gleichzeitig denselben Stand, erkennt die App das, lädt den fremden Stand nach und sagt Bescheid."
         ]
       }
