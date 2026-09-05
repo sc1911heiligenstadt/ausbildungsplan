@@ -19,6 +19,18 @@ const SAISON_STICHTAG_MONAT = 7;
 
 const APP_CHANGELOG = [
   {
+    version: "1.2",
+    groups: [
+      {
+        title: "Speichern",
+        items: [
+          "Wer die Seite direkt nach einer Eingabe schließt, verliert sie nicht mehr. Der Rettungs-Speicher beim Schließen startete bisher einen ganz normalen Netzaufruf — und den bricht der Browser beim Verlassen der Seite sofort wieder ab.",
+          "Trägt der Rettungsweg ausnahmsweise nicht (sehr großer Datenbestand, abgelaufene Anmeldung), fragt die App jetzt vor dem Schließen nach, statt stillschweigend etwas zu verlieren."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.1",
     groups: [
       {

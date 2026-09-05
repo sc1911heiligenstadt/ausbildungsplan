@@ -265,6 +265,13 @@ function normalizeData(data) {
 let saveTimer = null;
 let saveInFlight = false;
 let savePending = false;
+// Fuer das Sicherheitsnetz beim Verlassen der Seite (beforeunload weiter unten):
+// "es liegt etwas an" und "der letzte Versuch ging schief". Beides wird eigens
+// gepflegt statt aus savePending/saveInFlight abgeleitet -- der Debounce-Timer
+// laeuft schon, bevor irgendetwas davon gesetzt ist, und genau dieses Fenster
+// ist der Fall, den das Netz auffangen soll.
+let ungespeicherteAenderungen = false;
+let letzterSaveFehlgeschlagen = false;
 
 function setSaveStatus(text, istFehler) {
   const el = document.getElementById("save-status");
@@ -277,6 +284,7 @@ function setSaveStatus(text, istFehler) {
 function markDirty(delay) {
   if (!canEdit() && !canAdmin()) return;
   if (saveTimer) clearTimeout(saveTimer);
+  ungespeicherteAenderungen = true;
   setSaveStatus("Änderung vorgemerkt …");
   saveTimer = setTimeout(() => { saveTimer = null; persistNow(); }, delay === undefined ? 700 : delay);
 }
@@ -289,7 +297,11 @@ async function persistNow() {
     appData.meta.stand = new Date().toISOString();
     await gatewaySave(appData);
     setSaveStatus("Gespeichert um " + new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }));
+    ungespeicherteAenderungen = false;
+    letzterSaveFehlgeschlagen = false;
   } catch (e) {
+    ungespeicherteAenderungen = true;
+    letzterSaveFehlgeschlagen = true;
     if (e instanceof ConflictError) {
       setSaveStatus("Konflikt: Die Daten wurden zwischenzeitlich von einem anderen Gerät geändert. Bitte die Seite neu laden — die letzten Eingaben sind sonst nicht gespeichert.", true);
     } else if (e instanceof NotLoggedInError) {
@@ -299,7 +311,7 @@ async function persistNow() {
     }
   } finally {
     saveInFlight = false;
-    if (savePending) { savePending = false; persistNow(); }
+    if (savePending) { savePending = false; ungespeicherteAenderungen = true; persistNow(); }
   }
 }
 
@@ -1757,6 +1769,25 @@ async function init() {
   // in den Hintergrund geht oder geschlossen wird.
   window.addEventListener("pagehide", flushPending);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushPending(); });
+
+  // Der Flush oben rettet den Tab-Wechsel, weil die Seite dabei weiterlebt.
+  // Beim ECHTEN Verlassen bricht der Browser einen laufenden fetch ab: der
+  // Handler feuert, tut aber genau in dem Fall nichts, fuer den er gedacht ist.
+  // Der keepalive-Request ueberlebt das Schliessen des Tabs — dasselbe Muster
+  // wie in spielstatistik, Materialliste und elf weiteren Apps der Flotte.
+  //
+  // Nachgefragt wird NUR, wenn dieser Weg nicht traegt (Daten ueber der
+  // 64-KB-Grenze, kein Token, oder der letzte regulaere Versuch schlug schon
+  // fehl). Sonst kaeme die Rueckfrage bei JEDEM Schliessen kurz nach einer
+  // Aenderung -- also staendig -- und wuerde reflexhaft weggeklickt, gerade dann
+  // wenn sie einmal wirklich zaehlt.
+  window.addEventListener("beforeunload", (e) => {
+    if (!ungespeicherteAenderungen) return;
+    const abgeschickt = gatewaySaveBeacon(appData);
+    if (abgeschickt && !letzterSaveFehlgeschlagen) return;
+    e.preventDefault();
+    e.returnValue = "";
+  });
 
   if (!getSessionToken()) { showConnectScreen(); return; }
 

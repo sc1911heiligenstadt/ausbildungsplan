@@ -61,6 +61,45 @@ async function gatewaySave(dataObj) {
   gatewayRev = typeof body.rev === "string" ? body.rev : null;
 }
 
+// Letzter Rettungsversuch beim Verlassen der Seite. Ein normaler fetch wird beim
+// Entladen abgebrochen -- mit keepalive ueberlebt der Request das Schliessen des
+// Tabs. Betrifft zwei Faelle: einen noch nicht abgelaufenen Debounce-Timer und
+// einen gerade laufenden Schreibvorgang.
+// Bewusst MIT gatewayRev: ein unbedingter Schreibvorgang wuerde hier zwar immer
+// durchgehen, koennte aber die Aenderung eines anderen Geraets ueberschreiben,
+// ohne dass es jemand merkt. Lieber ein wirkungsloser 409 als stiller fremder
+// Datenverlust.
+//
+// Grenze: Browser erlauben fuer keepalive-Requests nur 64 KB Body. Groessere
+// Datenbestaende gehen auf diesem Weg gar nicht raus -- deshalb meldet die
+// Funktion zurueck, ob sie abschicken konnte; der Aufrufer (beforeunload in
+// app.js) fragt dann stattdessen nach.
+//
+// ⚠️ GETEILTER FLOTTEN-BAUSTEIN. Wortgleich in spielstatistik/db.js,
+// Materialliste/db.js und elf weiteren Apps -- es gibt keinen Build-Step, also
+// wird kopiert. Wer eine Fassung aendert, zieht die anderen mit.
+const KEEPALIVE_MAX_BYTES = 64 * 1024;
+
+function gatewaySaveBeacon(dataObj) {
+  const token = getSessionToken();
+  if (!token) return false;
+  const payload = { action: "dav-save", app: GATEWAY_APP_ID, data: dataObj };
+  if (gatewayRev) payload.rev = gatewayRev;
+  const body = JSON.stringify(payload);
+  if (new Blob([body]).size > KEEPALIVE_MAX_BYTES) return false;
+  try {
+    fetch(GATEWAY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+      body,
+      keepalive: true
+    });
+    return true;
+  } catch (_) {
+    return false; // z.B. wenn der Browser den keepalive-Request doch ablehnt
+  }
+}
+
 // Liefert {username, isAdmin, groupIds, vorname, nachname, mannschaften, canEdit, canAdmin}.
 async function fetchMe() {
   // Genau EINMAL aus dem letzten dav-load bedienen, danach wieder echt fragen:
