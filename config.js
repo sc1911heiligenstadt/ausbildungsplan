@@ -19,6 +19,17 @@ const SAISON_STICHTAG_MONAT = 7;
 
 const APP_CHANGELOG = [
   {
+    version: "1.1",
+    groups: [
+      {
+        title: "Jahrgangs-Auswertung",
+        items: [
+          "Die Umsetzungsgrad-Kurve rechnet jetzt über dieselben Schwerpunkte wie die Matrix darunter. Vorher zählte sie alles mit, was jemals bewertet wurde: ein auf „Aktiv = nein“ gesetzter Schwerpunkt blieb in der Kurve stehen, und nach einem Stufenwechsel sagte die Matrix „0 von 1 bewertet“, während die Kurve für denselben Spieltag weiter einen Punkt setzte."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.0",
     groups: [
       {

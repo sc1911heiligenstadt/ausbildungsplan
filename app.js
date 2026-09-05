@@ -131,8 +131,25 @@ function spieltageFuerJahrgang(jahrgang) {
 // beobachtet" geht NICHT in den Nenner ein — sonst sähe ein Bogen, in dem der
 // Trainer nur zwei Schwerpunkte beurteilt hat, schlechter aus als einer, in dem
 // er alle beurteilt hat.
-function umsetzungsgrad(spieltag) {
-  const werte = Object.values(spieltag.bewertungen || {}).filter(Boolean);
+//
+// Gerechnet wird NUR über die gerade gültigen Schwerpunkte — die aktiven
+// Schwerpunkte der Stufe, in der der Bogen steht. Das sind genau die Zeilen, die
+// die Matrix darunter zeigt. Vorher zählte `bewertungen` als Ganzes, und zwei
+// ganz normale Verwaltungsschritte trieben Kurve und Matrix auseinander: ein auf
+// "Aktiv = nein" gesetzter Schwerpunkt bleibt in `bewertungen` liegen und zählte
+// weiter mit, und nach einem Stufenwechsel (den die App selbst empfiehlt) sagte
+// die Matrix "0 von N bewertet", während die Kurve für denselben Spieltag
+// unverändert den alten Wert zeichnete.
+// `ids` darf ein Aufrufer mitgeben, der die Liste ohnehin schon hat; sonst wird
+// sie aus dem Bogen selbst hergeleitet, damit sie niemand vergessen kann.
+function umsetzungsgrad(spieltag, ids) {
+  const bew = spieltag.bewertungen || {};
+  let gueltige = ids;
+  if (!Array.isArray(gueltige)) {
+    const st = stufeFuerBogen(spieltag);
+    gueltige = st ? schwerpunkteFuerStufe(st.id, true).map((sp) => sp.id) : [];
+  }
+  const werte = gueltige.map((id) => bew[id]).filter(Boolean);
   if (!werte.length) return null;
   const punkte = werte.reduce((n, w) => n + (w === "gruen" ? 1 : w === "gelb" ? 0.5 : 0), 0);
   return Math.round((punkte / werte.length) * 100);
