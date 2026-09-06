@@ -983,15 +983,15 @@ function renderAuswertungJahrgang() {
 
 function vwFeld(label, id, wert, typ, optionen) {
   if (typ === "textarea") {
-    return `<div class="form-field"><label>${escapeHtml(label)}</label><textarea id="${id}" rows="3">${escapeHtml(wert || "")}</textarea></div>`;
+    return `<div class="form-field"><label for="${id}">${escapeHtml(label)}</label><textarea id="${id}" rows="3">${escapeHtml(wert || "")}</textarea></div>`;
   }
   if (typ === "select") {
-    return `<div class="form-field"><label>${escapeHtml(label)}</label><select id="${id}">${
+    return `<div class="form-field"><label for="${id}">${escapeHtml(label)}</label><select id="${id}">${
       optionen.map((o) => `<option value="${escapeHtml(o.id)}"${String(o.id) === String(wert) ? " selected" : ""}>${escapeHtml(o.label)}</option>`).join("")
     }</select></div>`;
   }
   if (typ === "checkbox") {
-    return `<div class="form-field"><label>${escapeHtml(label)}</label>
+    return `<div class="form-field"><label for="${id}">${escapeHtml(label)}</label>
       <div class="checkbox-zeile"><input type="checkbox" id="${id}"${wert ? " checked" : ""} /><span class="cbz-text">ja</span></div></div>`;
   }
   if (typ === "datalist") {
@@ -1001,12 +1001,12 @@ function vwFeld(label, id, wert, typ, optionen) {
     // Freitext bleibt möglich — eine datalist schlägt vor, sie verbietet nicht.
     const opts = (optionen || [])
       .map((o) => `<option value="${escapeHtml(o.id)}">${escapeHtml(o.label)}</option>`).join("");
-    return `<div class="form-field"><label>${escapeHtml(label)}</label>
+    return `<div class="form-field"><label for="${id}">${escapeHtml(label)}</label>
       <input type="text" id="${id}" list="${id}-liste" autocomplete="off" value="${escapeHtml(wert === null || wert === undefined ? "" : wert)}" />
       <datalist id="${id}-liste">${opts}</datalist></div>`;
   }
   const t = typ === "number" ? "number" : "text";
-  return `<div class="form-field"><label>${escapeHtml(label)}</label><input type="${t}" id="${id}" value="${escapeHtml(wert === null || wert === undefined ? "" : wert)}" /></div>`;
+  return `<div class="form-field"><label for="${id}">${escapeHtml(label)}</label><input type="${t}" id="${id}" value="${escapeHtml(wert === null || wert === undefined ? "" : wert)}" /></div>`;
 }
 
 // Schreibt die Formulardaten in den Bestand: entweder als neuer Eintrag oder in

@@ -19,6 +19,18 @@ const SAISON_STICHTAG_MONAT = 7;
 
 const APP_CHANGELOG = [
   {
+    version: "1.3",
+    groups: [
+      {
+        title: "Beschriftungen im Verwaltungs-Formular sind mit ihrem Feld verbunden",
+        items: [
+          "Die Beschriftung stand zwar über jedem Feld, war aber nicht mit ihm verknüpft. Ein Vorleseprogramm nennt dann nur ‚Eingabefeld‘, und ein Klick auf die Beschriftung setzte den Schreibzeiger nicht ins Feld.",
+          "Das gilt jetzt für alle fünf Feldarten des Formulars. Am Bildschirm ändert sich nichts."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.2",
     groups: [
       {
