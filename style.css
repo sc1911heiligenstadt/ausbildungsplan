@@ -455,3 +455,7 @@ body.printing-report #print-area { display: block; padding: 20px; }
   .ampel-btn { flex: 1 1 0; text-align: center; padding: 9px 6px; }
   .form-grid { grid-template-columns: 1fr; }
 }
+
+/* Karte "Funktionen" im Info-Reiter -- gleiche Bausteine wie der Changelog,
+   nur ohne Versionsmarke, darum etwas mehr Luft zwischen den Themen. */
+#funktionen-list { display: flex; flex-direction: column; gap: 18px; font-size: 13px; }

@@ -1605,8 +1605,29 @@ function druckeStufe() {
 
 // ---------- Info ----------
 
+// Was die App kann -- steht im Info-Reiter als Karte "Funktionen". Das ist NICHT
+// der Changelog: hier steht der Zustand, dort die Aenderung. Der Text liegt als
+// APP_FUNKTIONEN in config.js.
+function renderFunktionen() {
+  const container = document.getElementById("funktionen-list");
+  if (!container) return;
+  container.innerHTML = APP_FUNKTIONEN.map((g) => `
+    <div class="changelog-group">
+      <div class="cg-title">${escapeHtml(g.title)}</div>
+      <ul class="cg-items">${g.items.map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>
+    </div>
+  `).join("");
+}
+
+// Die Karte "Aenderungen" ist seit 07.09.2026 aus dem Info-Reiter raus.
+// APP_CHANGELOG bleibt in config.js gepflegt und wird weiter geschrieben -- es
+// ist die Quelle fuer die grosse Anleitung und fuer die Neuigkeiten-Meldungen
+// der Tools-Uebersicht. Diese Funktion steigt darum still aus, wenn es das Ziel
+// nicht gibt, statt beim Seitenstart mit einem Fehler abzubrechen.
 function renderChangelog() {
-  document.getElementById("changelog-list").innerHTML = APP_CHANGELOG.map((entry) => `
+  const container = document.getElementById("changelog-list");
+  if (!container) return;
+  container.innerHTML = APP_CHANGELOG.map((entry) => `
     <div class="changelog-entry">
       <span class="cv">Version ${escapeHtml(entry.version)}</span>
       ${entry.groups.map((g) => `
@@ -1703,7 +1724,7 @@ function showConnectScreen(errorMsg) {
 }
 
 async function init() {
-  document.getElementById("version-badge-2").textContent = "v" + APP_VERSION;
+  renderFunktionen();
   renderChangelog();
   renderInfoStatisch();
   setupTabs();
